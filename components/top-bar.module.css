@@ -1,0 +1,20 @@
+.menu {
+    position: relative;
+    z-index: 1;
+}
+
+.menu ul {
+    display: flex;
+    flex-direction: row-reverse;
+}
+
+.menu li {
+    list-style: none;
+    padding: 20px;
+}
+
+.menu a:hover{
+    border-bottom: 1px solid hsl(0,0%,0%,100);
+}
+
+
