@@ -1,0 +1,26 @@
+.menuItem__desc{
+    position: relative;
+    z-index: 1;
+    background:hsla(0, 0%, 100%, .5);
+    padding: 20px;
+    max-width: 400px;
+}
+
+.menuItem__descLeft{
+    margin-left:40px;
+}
+
+.menuItem__descRight{
+    margin-right:40px;
+}
+
+.menuItem__li{
+    height:400px;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.menuItem__liDirRowReverse{
+    flex-direction: row-reverse;
+}

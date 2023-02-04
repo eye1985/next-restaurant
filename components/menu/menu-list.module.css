@@ -1,0 +1,10 @@
+.menuList {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+}
+
+.menuList__toCart{
+    position: relative;
+    z-index: 1;
+}
