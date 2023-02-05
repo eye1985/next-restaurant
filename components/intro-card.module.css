@@ -1,0 +1,62 @@
+.introCard{
+    container-type: inline-size;
+    container-name: introCard;
+}
+
+.grid{
+    box-shadow: 0 0  10px hsla(0, 0%, 82%, 1);
+}
+
+.imgWrapper{
+    position: relative;
+    height:150px;
+    width:100%;
+}
+
+.text{
+    --introCard-bg:hsla(0, 100%, 100%, .7);
+    line-height:1.5;
+    font-size:1.6rem;
+    position: relative;
+    z-index:1;
+    background:var(--introCard-bg);
+    padding: 20px;
+}
+
+.text > p{
+    margin-bottom:10px;
+}
+
+.rtl{
+    direction: rtl;
+}
+
+.ltr{
+    direction:ltr;
+}
+
+.textLeft{
+    text-align: left;
+}
+
+@container introCard (min-width: 720px){
+    .grid{
+        display:grid;
+        grid-template-columns: 1fr 1fr;
+        margin-bottom:60px;
+    }
+
+    .text{
+        font-size:1.4rem;
+        padding: 40px 60px;
+    }
+
+    .text > p{
+        margin-bottom:1rem;
+    }
+
+    .imgWrapper{
+        width:auto;
+        height:auto;
+    }
+}

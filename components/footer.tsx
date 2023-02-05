@@ -11,14 +11,16 @@ function Footer() {
                 </strong>
 
                 <p>
-                    Monday - closed
+                    Sunday - Monday - closed
                 </p>
 
                 <p>
-                    Tuesday - 10:00 - 21:00
+                    Tuesday - Friday - 10:00 - 21:00
                 </p>
 
-
+                <p>
+                    Saturday - 12:00 - 21:00
+                </p>
             </Layout>
         </footer>
     );

@@ -1,8 +1,16 @@
+import Head from "next/head";
+
 function Reservation(){
     return (
         <>
-            <h1>Reservation</h1>
-            stuff
+            <Head>
+                <title>Reservation</title>
+                <meta name="description" content="Reservation for Bao restaurant" />
+            </Head>
+            <main>
+                <h1>Reservation</h1>
+                stuff
+            </main>
         </>
     );
 }

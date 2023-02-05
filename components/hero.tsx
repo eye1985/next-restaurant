@@ -3,10 +3,11 @@ import classes from "./hero.module.css";
 
 interface HeroProps {
     title: string;
+    char: string;
 }
 
 function Hero(props: HeroProps) {
-    const { title } = props;
+    const { title, char } = props;
     return (
         <header className={classes.header}>
             <Image
@@ -18,7 +19,10 @@ function Hero(props: HeroProps) {
                 }}
             />
 
-            <h1 className={classes.h1}>{title}</h1>
+            <h1 className={classes.h1}>
+                {title}
+                <span className={classes.char}>{char}</span>
+            </h1>
         </header>
     );
 }

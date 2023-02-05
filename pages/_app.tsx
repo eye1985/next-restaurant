@@ -1,17 +1,15 @@
 import "@/styles/globals.css";
 import type { AppProps } from "next/app";
 import TopBar from "@/components/top-bar";
-import Layout from "@/layout/layout";
 import Footer from "@/components/footer";
+import Grid from "@/layout/grid/Grid";
 
 export default function App({ Component, pageProps }: AppProps) {
     return (
-        <>
-            <Layout>
-                <TopBar />
-                <Component {...pageProps} />
-            </Layout>
+        <Grid>
+            <TopBar />
+            <Component {...pageProps} />
             <Footer />
-        </>
+        </Grid>
     );
 }

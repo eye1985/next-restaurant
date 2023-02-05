@@ -1,6 +1,9 @@
 .menu {
-    position: relative;
+    --menubg:hsla(0, 100%, 100%, 0);
+    position: absolute;
     z-index: 1;
+    background: var(--menubg);
+    width:100%;
 }
 
 .menu ul {
