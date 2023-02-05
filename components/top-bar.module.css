@@ -1,6 +1,6 @@
 .menu {
     --menubg:hsla(0, 100%, 100%, 0);
-    position: absolute;
+    position: relative;
     z-index: 1;
     background: var(--menubg);
     width:100%;
@@ -25,4 +25,13 @@
     margin-right:auto;
 }
 
+@media (min-width:720px){
+    .menu li:last-child {
+        padding-left:0;
+    }
+
+    .menu li:first-child {
+        padding-right:0;
+    }
+}
 

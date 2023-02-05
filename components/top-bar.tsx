@@ -49,7 +49,7 @@ function TopBar() {
 
                     <li className={classes.home}>
                         <Link href="/" title="home">
-                            Restaurant 包
+                            Bao 包
                         </Link>
                     </li>
                 </ul>

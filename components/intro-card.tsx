@@ -23,7 +23,7 @@ function IntroCard(props: IntroCardProps) {
             : `${classes.rtl} ${classes.grid}`;
     const textClass =
         textAlign === Direction.Left
-            ? `${classes.textLeft} ${classes.text}`
+            ? `${classes.ltr} ${classes.text}`
             : classes.text;
 
     return (

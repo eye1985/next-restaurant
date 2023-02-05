@@ -1,6 +1,8 @@
 :root {
   --bg-color: #fff;
   --font-size: 62.5%;
+  --font-color:hsl(0, 0%, 12%, 1);
+  --box-shadow-color: hsla(0, 0%, 82%, 1);
 }
 
 * {

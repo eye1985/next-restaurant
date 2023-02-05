@@ -1,0 +1,11 @@
+.italic{
+    font-style: italic !important;
+}
+
+.fw300{
+    font-weight: 300 !important;
+}
+
+.fw500{
+    font-weight: 500 !important;
+}

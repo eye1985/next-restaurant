@@ -35,10 +35,6 @@
     direction:ltr;
 }
 
-.textLeft{
-    text-align: left;
-}
-
 @container introCard (min-width: 720px){
     .grid{
         display:grid;
