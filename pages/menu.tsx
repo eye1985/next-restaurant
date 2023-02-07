@@ -13,7 +13,9 @@ function Menu() {
 
             <Layout>
                 <HeaderTitle>À la carte</HeaderTitle>
-                <MenuList />
+                <main>
+                    <MenuList />
+                </main>
             </Layout>
         </>
     );

@@ -1,0 +1,40 @@
+.reservationForm{
+    background:var(--reservation-form-bg);
+    padding:20px;
+}
+
+.formControl{
+    display:flex;
+    flex-direction:column;
+
+}
+.formControl input{
+    padding: 4px 6px;
+}
+
+.error{
+    color:hsla(0, 100%, 50%, 1);
+}
+
+.margin{
+    margin-bottom:20px;
+}
+
+.submitContainer{
+    display: flex;
+    justify-content: center;
+}
+
+.submit{
+    padding: 6px 20px;
+    margin-top:10px;
+    background:#fff;
+}
+
+
+
+@media (min-width:720px){
+    .reservationForm{
+        padding:40px;
+    }
+}

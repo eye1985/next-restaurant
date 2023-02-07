@@ -1,0 +1,40 @@
+.daySelector{
+    container-type:inline-size;
+    container-name:daySelector;
+}
+
+.daySelectorContainer{
+    display:grid;
+    grid-template-rows: auto 1fr auto;
+}
+
+.calendar{
+    margin-bottom: 40px;
+}
+
+.radioContainer{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap:15px;
+}
+.radioItem{
+    padding: 10px;
+    background: hsla(0, 100%, 100%, 1);
+    border: 1px solid black;
+    display:flex;
+    align-items: center;
+}
+
+.radioItem > input[type='radio']{
+    margin-right:10px;
+}
+
+.radioItem > label{
+    width:100%;
+}
+
+@container daySelector (min-width:720px){
+
+}
+
+
