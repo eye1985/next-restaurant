@@ -1,46 +1,43 @@
-import {ClassNames, DayPicker, SelectSingleEventHandler} from "react-day-picker";
+import {
+    ClassNames,
+    DayPicker,
+    SelectSingleEventHandler,
+} from "react-day-picker";
 import styles from "react-day-picker/dist/style.module.css";
-import {Ref} from "react";
-import {format} from "date-fns";
+import { Ref } from "react";
 import dayjs from "dayjs";
 import classes from "./day-selector.module.css";
 
-interface DaySelectorProps{
-    className:string;
-    radioGroupRef:Ref<HTMLDivElement>;
+interface DaySelectorProps {
+    className?: string;
+    radioGroupRef: Ref<HTMLDivElement>;
     selected: Date | undefined;
-    setSelected: SelectSingleEventHandler
+    setSelected: SelectSingleEventHandler;
 }
 
-function DaySelector(props:DaySelectorProps) {
-
-    const {selected, setSelected} = props;
-
-    let footer = <p>Please pick a day.</p>;
-    if (selected) {
-        footer = <p>You picked {format(selected, "PP")}.</p>;
-    }
+function DaySelector(props: DaySelectorProps) {
+    const { selected, setSelected } = props;
 
     const listOfReservations = (
         hour: number,
         min: number,
         loopNumber: number,
-        selectedDate:Date,
+        selectedDate: Date
     ) => {
-
-        console.log(dayjs(selectedDate).format("DD.MM.YYYY"), "does it work")
-
         let tempLoop = 0;
-        let tempTime = dayjs()
+        let tempTime = dayjs(selectedDate)
             .set("hour", hour)
             .set("minute", min)
             .set("second", 0);
 
-        const result: string[] = [];
+        const result: { time: string; iso: string }[] = [];
 
         while (tempLoop < loopNumber) {
             const add15min = tempTime.add(15, "minute");
-            result.push(add15min.format("HH:mm"));
+            result.push({
+                time: add15min.format("HH:mm"),
+                iso: add15min.toISOString(),
+            });
             tempTime = add15min;
             tempLoop++;
         }
@@ -50,72 +47,57 @@ function DaySelector(props:DaySelectorProps) {
 
     const classNames: ClassNames = {
         ...styles,
-        root: "custom-root",
-        months: "custom-months",
-        tfoot:"custom-tfoot",
+        root: classes.customRoot,
+        months: classes.customMonths,
+        tfoot: classes.customTfoot
     };
+
+    const isWeekday = (date: Date) => {
+        const day = date.getDay();
+        return day === 0 || day === 1;
+    };
+
+    const disabledDays = [isWeekday, { before: new Date() }];
 
     return (
         <div className={`${classes.daySelector} ${props.className}`}>
             <div className={classes.daySelectorContainer}>
-                <div>
-                    <div className={classes.calendar}>
-                        <style>{`
-                            .custom-root{
-                                --rdp-cell-size: 40px;
-                                --rdp-accent-color: #0000ff;
-                                --rdp-background-color: #e7edff;
-                                --rdp-accent-color-dark: #3003e1;
-                                --rdp-background-color-dark: #180270;
-                                --rdp-outline: 2px solid var(--rdp-accent-color);
-                                --rdp-outline-selected: 3px solid var(--rdp-accent-color);
-                                margin:0;
-                            }
-                            .custom-months{
-                                display:flex;
-                                justify-content:center;
-                            }
-                            
-                            .custom-tfoot{
-                                margin: 0.5em;
-                            }
-                            
-                            .custom-tfoot p{
-                                padding-left:9px;
-                            }
-                        `}</style>
-                        <DayPicker
-                            classNames={classNames}
-                            mode="single"
-                            required
-                            disabled={{before: new Date()}}
-                            selected={selected}
-                            onSelect={setSelected}
-                            footer={footer}
-                        />
-                    </div>
-
-                    {selected? (
-                        <div className={classes.radioContainer} ref={props.radioGroupRef}>
-                            {listOfReservations(15, 45, 13, selected).map(
-                                (time: string, index: number) => (
-                                    <div
-                                        className={classes.radioItem}
-                                        key={`${index}_reservation-button`}
-                                    >
-                                        <input
-                                            id={time}
-                                            type="radio"
-                                            value={time}
-                                            name="time"
-                                        />
-                                        <label htmlFor={time}>{time}</label>
-                                    </div>
-                                )
-                            )}
-                        </div>
-                    ):null}
+                <div className={classes.calendar}>
+                    <DayPicker
+                        classNames={classNames}
+                        mode="single"
+                        required
+                        disabled={disabledDays}
+                        selected={selected}
+                        onSelect={setSelected}
+                    />
                 </div>
+
+                {selected ? (
+                    <div
+                        className={classes.radioContainer}
+                        ref={props.radioGroupRef}
+                    >
+                        {listOfReservations(15, 45, 13, selected).map(
+                            (dateObj, index: number) => (
+                                <div
+                                    className={classes.radioItem}
+                                    key={`${index}_reservation-button`}
+                                >
+                                    <input
+                                        id={dateObj.time}
+                                        type="radio"
+                                        value={dateObj.iso}
+                                        name="time"
+                                    />
+                                    <label htmlFor={dateObj.time}>
+                                        {dateObj.time}
+                                    </label>
+                                </div>
+                            )
+                        )}
+                    </div>
+                ) : null}
             </div>
         </div>
     );

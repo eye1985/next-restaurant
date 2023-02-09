@@ -26,6 +26,10 @@
 }
 
 @media (min-width:720px){
+    .menu{
+        padding:0 40px;
+    }
+
     .menu li:last-child {
         padding-left:0;
     }
