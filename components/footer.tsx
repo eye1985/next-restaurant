@@ -5,22 +5,35 @@ function Footer() {
     return (
         <footer className={classes.footer}>
             <Layout>
+                <div className={classes.flex}>
+                    <article className={classes.openingHours}>
+                        <h2>
+                            Opening hours
+                        </h2>
 
-                <strong>
-                    Opening hours
-                </strong>
+                        <p>
+                            Sunday - Monday - closed
+                        </p>
 
-                <p>
-                    Sunday - Monday - closed
-                </p>
+                        <p>
+                            Tuesday - Friday - 10:00 - 21:00
+                        </p>
 
-                <p>
-                    Tuesday - Friday - 10:00 - 21:00
-                </p>
+                        <p>
+                            Saturday - 12:00 - 21:00
+                        </p>
+                    </article>
 
-                <p>
-                    Saturday - 12:00 - 21:00
-                </p>
+                    <article>
+                        <h2>
+                            Visit us at
+                        </h2>
+                        <address>
+                            Bao street 1009 <br />
+                            6001 Bao city
+                        </address>
+                    </article>
+                </div>
             </Layout>
         </footer>
     );

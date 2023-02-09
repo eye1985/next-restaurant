@@ -30,9 +30,10 @@ export default function Home() {
                 <link rel="icon" href="/favicon.ico" />
             </Head>
             <Hero title="Bao" char="包" />
-            <main className={utilClassName.mt60}>
+            <main>
                 <Layout>
                     <IntroCard
+                        title="Our restaurant"
                         imageSrc="overhead.jpg"
                         alt="about our restaurant"
                         direction={Direction.Left}
@@ -40,6 +41,7 @@ export default function Home() {
                     />
 
                     <IntroCard
+                        title="Our head chef"
                         imageSrc="chef.jpg"
                         alt="chef Wang"
                         direction={Direction.Right}

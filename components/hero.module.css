@@ -13,16 +13,14 @@
 .h1 {
     font-size: 81px;
     font-weight: 300;
-    background:hsla(0, 0%, 100%, 0.6);
+    background: hsla(0, 0%, 100%, 0.6);
     z-index: 1;
     padding: 0 20px;
 }
 
-.char{
-    --charColor:hsla(0, 100%, 40%, 1);
-    --charShadowColor:hsla(0, 100%, 12%, 1);
-    display:inline-block;
-    margin-left:10px;
-    color:var(--charColor);
-    text-shadow: 0 3px 3px #1e1e1e;
+.char {
+    display: inline-block;
+    margin-left: 10px;
+    color: var(--heroCharColor);
+    text-shadow: 0 3px 3px var(--herCharShadowColor)
 }

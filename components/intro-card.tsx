@@ -10,12 +10,13 @@ interface IntroCardProps {
     imageSrc: string;
     alt: string;
     desc: string[];
+    title:string;
     direction: Direction;
     textAlign?: Direction;
 }
 
 function IntroCard(props: IntroCardProps) {
-    const { imageSrc, desc, alt, direction, textAlign } = props;
+    const { imageSrc, desc, alt, direction, textAlign, title } = props;
 
     const gridClass =
         direction === Direction.Left
@@ -42,6 +43,7 @@ function IntroCard(props: IntroCardProps) {
                     />
                 </div>
                 <article className={textClass}>
+                    <h2>{title}</h2>
                     {desc.map((text, index) => (
                         <p key={index + "_introCardText"}>{text}</p>
                     ))}

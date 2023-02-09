@@ -3,24 +3,27 @@
     container-name: introCard;
 }
 
-.grid{
-    box-shadow: 0 0  10px var(--box-shadow-color);
-}
-
 .imgWrapper{
     position: relative;
     height:150px;
     width:100%;
 }
 
+.introCard h2{
+    font-weight: 600;
+    font-size:1.8rem;
+    margin-bottom:10px;
+}
+
 .text{
     --introCard-bg:hsla(0, 100%, 100%, .7);
     line-height:1.5;
+    font-weight:500;
     font-size:1.6rem;
     position: relative;
     z-index:1;
     background:var(--introCard-bg);
-    padding: 20px;
+    padding: 40px 20px 20px;
 }
 
 .text > p{
@@ -40,15 +43,23 @@
         display:grid;
         grid-template-columns: 1fr 1fr;
         margin-bottom:60px;
+        box-shadow: 0 0  10px var(--box-shadow-color);
+    }
+
+    .introCard h2{
+        font-weight: 600;
+        font-size:1.6rem;
+        margin-bottom:10px;
     }
 
     .text{
         font-size:1.4rem;
+        line-height: 1.8;
         padding: 40px 60px;
     }
 
     .text > p{
-        margin-bottom:1rem;
+        margin-bottom:2rem;
     }
 
     .imgWrapper{
