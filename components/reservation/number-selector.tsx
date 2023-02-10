@@ -1,8 +1,9 @@
 import classes from "@/components/reservation/number-selector.module.css";
-import {Ref} from "react";
+import {ChangeEvent, Ref} from "react";
 
 interface NumberSelectorProps{
-    refObj: Ref<HTMLSelectElement>
+    onChange: (event:ChangeEvent<HTMLSelectElement>)=>void;
+    guests:number;
 }
 
 function NumberSelector(props:NumberSelectorProps) {
@@ -11,7 +12,7 @@ function NumberSelector(props:NumberSelectorProps) {
         <div className={classes.select}>
             <label htmlFor={selectId}>Reserve for</label>
             <select
-                ref={props.refObj}
+                onChange={props.onChange}
                 className={classes.selectInput}
                 id={selectId}
                 defaultValue="2"

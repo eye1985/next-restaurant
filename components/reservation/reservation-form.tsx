@@ -1,23 +1,44 @@
 import DaySelector from "@/components/reservation/day-selector";
-import { FormEvent, useRef, useState } from "react";
+import { ChangeEvent, Dispatch, FormEvent, useContext, useState } from "react";
 import classes from "./reservation-form.module.css";
 import NumberSelector from "@/components/reservation/number-selector";
 import { SelectSingleEventHandler } from "react-day-picker";
 import Modal from "react-modal";
 import dayjs from "dayjs";
+import { ReservationContext } from "@/context/reservation-context-provider";
+import errorClasses from "@/styles/utils/error.module.css";
 
 interface ReservationFormProps {
-    submitReservationHandler : () => void
+    submitReservationHandler: () => void;
+    setGuests: Dispatch<number>;
+    guests: number;
+    email: string;
+    setEmail: Dispatch<string>;
+    guestName: string;
+    setName: Dispatch<string>;
+    phone: number | string;
+    setPhone: Dispatch<number>;
 }
 
-function ReservationForm(props:ReservationFormProps) {
-    const selectInputRef = useRef<HTMLSelectElement>(null);
-    const emailInputRef = useRef<HTMLInputElement>(null);
-    const radioGroupRef = useRef<HTMLDivElement>(null);
+function ReservationForm(props: ReservationFormProps) {
     const [hasError, setHasError] = useState(false);
-    const [timeError, setTimeError] = useState(false);
-    const [selectedDate, setSelectedDate] = useState<Date>(new Date());
     const [modalIsOpen, setIsOpen] = useState(false);
+
+    const {
+        selectedTime,
+        setSelectedTime,
+        selectedDay,
+        setSelectedDay,
+        setTimeError,
+    } = useContext(ReservationContext);
+
+    const selectGuestHandler = (event: ChangeEvent<HTMLSelectElement>) => {
+        props.setGuests(parseInt(event.target.value));
+    };
+
+    const radioChangeHandler = (event: ChangeEvent<HTMLInputElement>) => {
+        setSelectedTime(event.target.value);
+    };
 
     const customStyles = {
         content: {
@@ -46,19 +67,12 @@ function ReservationForm(props:ReservationFormProps) {
         setHasError(false);
         setTimeError(false);
 
-        const emailValue = emailInputRef.current?.value;
-        const selectPersonsValue = selectInputRef.current?.value;
-        const radioGroupDiv = radioGroupRef.current;
-
-        const selectedRadio: HTMLInputElement | null | undefined =
-            radioGroupDiv?.querySelector("input[type='radio']:checked");
-
-        if (!selectedRadio) {
+        if (!selectedTime) {
             setTimeError(true);
             return;
         }
 
-        if (!emailValue) {
+        if (!props.email) {
             setHasError(true);
             return;
         }
@@ -73,25 +87,63 @@ function ReservationForm(props:ReservationFormProps) {
 
     return (
         <>
-            <form className={classes.reservationForm} onSubmit={submitFormHandler}>
-                <NumberSelector refObj={selectInputRef} />
+            <form
+                className={classes.reservationForm}
+                onSubmit={submitFormHandler}
+            >
+                <NumberSelector
+                    onChange={selectGuestHandler}
+                    guests={props.guests}
+                />
+
                 <DaySelector
-                    selected={selectedDate}
-                    setSelected={setSelectedDate as SelectSingleEventHandler}
-                    radioGroupRef={radioGroupRef}
-                ></DaySelector>
-                {timeError ? (
-                    <p className={classes.error}>Please select a time</p>
-                ) : null}
+                    selected={selectedDay}
+                    setSelected={setSelectedDay as SelectSingleEventHandler}
+                    radioChangeHandler={radioChangeHandler}
+                />
 
                 <div className={classes.formControl}>
                     <label htmlFor="email">E-mail:</label>
-                    <input id="email" type="email" ref={emailInputRef} placeholder="youremail@provider.com" />
+                    <input
+                        id="email"
+                        type="email"
+                        value={props.email}
+                        onChange={(event) => {
+                            props.setEmail(event.target.value);
+                        }}
+                        placeholder="youremail@provider.com"
+                    />
                     {hasError ? (
-                        <p className={classes.error}>
+                        <p className={errorClasses.errorText}>
                             Please input a correct e-mail address
                         </p>
                     ) : null}
+                </div>
+
+                <div className={classes.formControl}>
+                    <label htmlFor="name">Name:</label>
+                    <input
+                        id="name"
+                        type="text"
+                        placeholder="John Smith"
+                        value={props.guestName}
+                        onChange={(event) => {
+                            props.setName(event.target.value);
+                        }}
+                    />
+                </div>
+
+                <div className={classes.formControl}>
+                    <label htmlFor="phone">Phone:</label>
+                    <input
+                        id="phone"
+                        type="number"
+                        placeholder="99 99 99 99"
+                        value={props.phone}
+                        onChange={(event) => {
+                            props.setPhone(parseInt(event.target.value));
+                        }}
+                    />
                 </div>
 
                 <div className={classes.submitContainer}>
@@ -100,6 +152,7 @@ function ReservationForm(props:ReservationFormProps) {
                     </button>
                 </div>
             </form>
+
             <Modal
                 isOpen={modalIsOpen}
                 onRequestClose={closeModal}
@@ -107,19 +160,21 @@ function ReservationForm(props:ReservationFormProps) {
                 contentLabel="Example Modal"
             >
                 <p>
-                    Are you sure you want to reserve for{" "}
-                    {selectInputRef.current?.value} {" "}
-                    person at{" "}
-                    {dayjs(
-                        (
-                            radioGroupRef.current?.querySelector(
-                                "input[type='radio']:checked"
-                            ) as HTMLInputElement
-                        )?.value
-                    ).format("DD.MM.YYYY HH:mm")}
+                    The table will be reserved for {props.guestName}. (
+                    {props.phone})
                 </p>
 
-                <button onClick={submitHandler}>Confirm</button>
+                <p>
+                    Reserve for {props.guests} person at{" "}
+                    <time>
+                        {dayjs(selectedTime).format("DD.MM.YYYY HH:mm")}
+                    </time>
+                </p>
+
+                <div>
+                    <button onClick={submitHandler}>Confirm</button>
+                    <button onClick={closeModal}>Cancel</button>
+                </div>
             </Modal>
         </>
     );

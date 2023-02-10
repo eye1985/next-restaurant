@@ -6,7 +6,7 @@
 .formControl{
     display:flex;
     flex-direction:column;
-    margin-bottom:40px;
+    margin-bottom:20px;
 }
 
 .formControl label{
@@ -16,10 +16,6 @@
     padding: 8px;
 }
 
-.error{
-    color:hsla(0, 100%, 50%, 1);
-}
-
 .margin{
     margin-bottom:20px;
 }
@@ -27,6 +23,7 @@
 .submitContainer{
     display: flex;
     justify-content: center;
+    margin-top:40px;
 }
 
 .submit{

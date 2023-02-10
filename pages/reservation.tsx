@@ -1,30 +1,53 @@
 import Head from "next/head";
-import { GetServerSidePropsContext } from "next";
 
 import Layout from "@/layout/layout";
 import HeaderTitle from "@/components/header-title";
 import ReservationForm from "@/components/reservation/reservation-form";
+import { useContext, useEffect, useState } from "react";
+import { ReservationBody } from "@/pages/api/reservation";
+import { ReservationContext } from "@/context/reservation-context-provider";
 
 interface ReservationProps {}
 
 function Reservation(props: ReservationProps) {
+    const [email, setEmail] = useState("");
+    const [guestNumber, setGuestNumber] = useState(2);
+    const [guestName, setGuestName] = useState("");
+    const [guestPhone, setGuestPhone] = useState<number | string>("");
+
+    const { selectedTime } = useContext(ReservationContext);
+
+    useEffect(() => {
+        console.log(11111);
+
+        fetch("/api/reservation", {
+            method: "get",
+        })
+            .then((res) => res.json())
+            .then((data) => console.log(data));
+    }, []);
+
     const submitReservationHandler = async () => {
-        try{
+        try {
+            const reservationBody: ReservationBody = {
+                email,
+                phone: guestPhone as number,
+                name: guestName,
+                time: selectedTime,
+            };
+
             const response = await fetch("/api/reservation", {
-                method:"post",
-                headers:{
-                    "Content-Type":"application/json"
+                method: "post",
+                headers: {
+                    "Content-Type": "application/json",
                 },
-                body:JSON.stringify({
-                    date: new Date().toISOString(),
-                    persons:1
-                })
+                body: JSON.stringify(reservationBody),
             });
 
-            const json = await response.json();
-
-            console.log(json)
-        }catch (error){
+            if (!response.ok) {
+                throw new Error("Could not reserve a table");
+            }
+        } catch (error) {
             console.error(error);
         }
     };
@@ -43,26 +66,19 @@ function Reservation(props: ReservationProps) {
                 <main>
                     <ReservationForm
                         submitReservationHandler={submitReservationHandler}
+                        email={email}
+                        setEmail={setEmail}
+                        guests={guestNumber}
+                        setGuests={setGuestNumber}
+                        guestName={guestName}
+                        setName={setGuestName}
+                        phone={guestPhone}
+                        setPhone={setGuestPhone}
                     />
                 </main>
             </Layout>
         </>
     );
-}
-
-export async function getServerSideProps(context: GetServerSidePropsContext) {
-    const props: ReservationProps = {};
-    // const db = await connect();
-    //
-    // const collection = await (db as Db).collection("reservation");
-
-    // console.log(dayjs().format("DD-MM-YYYY"));
-
-    return {
-        props: {
-            test: "test",
-        },
-    };
 }
 
 export default Reservation;

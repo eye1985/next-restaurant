@@ -4,19 +4,22 @@ import {
     SelectSingleEventHandler,
 } from "react-day-picker";
 import styles from "react-day-picker/dist/style.module.css";
-import { Ref } from "react";
 import dayjs from "dayjs";
 import classes from "./day-selector.module.css";
+import errorClasses from "@/styles/utils/error.module.css";
+import { ChangeEvent, useContext } from "react";
+import { ReservationContext } from "@/context/reservation-context-provider";
 
 interface DaySelectorProps {
     className?: string;
-    radioGroupRef: Ref<HTMLDivElement>;
     selected: Date | undefined;
     setSelected: SelectSingleEventHandler;
+    radioChangeHandler: (event: ChangeEvent<HTMLInputElement>) => void;
 }
 
 function DaySelector(props: DaySelectorProps) {
     const { selected, setSelected } = props;
+    const { timeError } = useContext(ReservationContext);
 
     const listOfReservations = (
         hour: number,
@@ -34,6 +37,7 @@ function DaySelector(props: DaySelectorProps) {
 
         while (tempLoop < loopNumber) {
             const add15min = tempTime.add(15, "minute");
+
             result.push({
                 time: add15min.format("HH:mm"),
                 iso: add15min.toISOString(),
@@ -49,7 +53,7 @@ function DaySelector(props: DaySelectorProps) {
         ...styles,
         root: classes.customRoot,
         months: classes.customMonths,
-        tfoot: classes.customTfoot
+        tfoot: classes.customTfoot,
     };
 
     const isWeekday = (date: Date) => {
@@ -74,28 +78,33 @@ function DaySelector(props: DaySelectorProps) {
                 </div>
 
                 {selected ? (
-                    <div
-                        className={classes.radioContainer}
-                        ref={props.radioGroupRef}
-                    >
-                        {listOfReservations(15, 45, 13, selected).map(
-                            (dateObj, index: number) => (
-                                <div
-                                    className={classes.radioItem}
-                                    key={`${index}_reservation-button`}
-                                >
-                                    <input
-                                        id={dateObj.time}
-                                        type="radio"
-                                        value={dateObj.iso}
-                                        name="time"
-                                    />
-                                    <label htmlFor={dateObj.time}>
-                                        {dateObj.time}
-                                    </label>
-                                </div>
-                            )
-                        )}
+                    <div>
+                        <div className={classes.radioContainer}>
+                            {listOfReservations(15, 45, 13, selected).map(
+                                (dateObj, index: number) => (
+                                    <div
+                                        className={classes.radioItem}
+                                        key={`${index}_reservation-button`}
+                                    >
+                                        <input
+                                            id={dateObj.time}
+                                            type="radio"
+                                            value={dateObj.iso}
+                                            onChange={props.radioChangeHandler}
+                                            name="time"
+                                        />
+                                        <label htmlFor={dateObj.time}>
+                                            {dateObj.time}
+                                        </label>
+                                    </div>
+                                )
+                            )}
+                        </div>
+                        {timeError ? (
+                            <p className={errorClasses.errorText}>
+                                Please select a time
+                            </p>
+                        ) : null}
                     </div>
                 ) : null}
             </div>
