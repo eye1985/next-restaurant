@@ -21,28 +21,36 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     switch (req.method) {
         case FetchMethods.GET: {
-            const collection = client
-                .db("Bao")
-                .collection("reservations");
+            try {
+                const collection = client
+                    .db("Bao")
+                    .collection("reservations");
 
-            const startDate = new Date(2023,1, 11);
-            const endDate = new Date(2023,1, 12);
+                const startDate = new Date(2023,1, 11);
+                const endDate = new Date(2023,1, 12);
 
-            const reservations = await collection.find({
-                time : {
-                    $gt: startDate,
-                    $lt:endDate,
-                }
-            }).toArray();
+                const reservations = await collection.find({
+                    time : {
+                        $gt: startDate,
+                        $lt:endDate,
+                    }
+                }).toArray();
 
-            // reservations.forEach(item => {
-            //     console.log(dayjs(item.time).format("DD.MM.YYYY HH:mm"));
-            // })
+                // reservations.forEach(item => {
+                //     console.log(dayjs(item.time).format("DD.MM.YYYY HH:mm"));
+                // })
 
-            await client.close();
-            res.status(200).json({
-                reservations: reservations,
-            });
+                await client.close();
+                res.status(200).json({
+                    reservations: reservations,
+                });
+            }catch (error){
+                await client.close();
+                res.status(500).json({
+                    message: "Failed to retrieve collection ",
+                    error,
+                });
+            }
 
             break;
         }
@@ -65,6 +73,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
                     message: `${insert.insertedId} created`,
                 });
             } catch (error) {
+
+                await client.close();
                 res.status(500).json({
                     message: `Failed to create record`,
                 });
