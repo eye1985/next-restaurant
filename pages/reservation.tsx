@@ -3,37 +3,33 @@ import Head from "next/head";
 import Layout from "@/layout/layout";
 import HeaderTitle from "@/components/header-title";
 import ReservationForm from "@/components/reservation/reservation-form";
-import { useContext, useEffect, useState } from "react";
-import { ReservationBody } from "@/pages/api/reservation";
-import { ReservationContext } from "@/context/reservation-context-provider";
+import {useContext, useEffect} from "react";
+import {ReservationBody} from "@/pages/api/reservation";
+import {ReservationContext} from "@/context/reservation-context-provider";
 
-interface ReservationProps {}
-
-function Reservation(props: ReservationProps) {
-    const [email, setEmail] = useState("");
-    const [guestNumber, setGuestNumber] = useState(2);
-    const [guestName, setGuestName] = useState("");
-    const [guestPhone, setGuestPhone] = useState<number | string>("");
-
-    const { selectedTime } = useContext(ReservationContext);
+function Reservation() {
+    const {selectedTime, phone, fullName, email} =
+        useContext(ReservationContext);
 
     useEffect(() => {
-        console.log(11111);
-
-        fetch("/api/reservation", {
-            method: "get",
-        })
-            .then((res) => res.json())
-            .then((data) => console.log(data));
+        try {
+            fetch("/api/reservation", {
+                method: "get",
+            })
+                .then((res) => res.json())
+                .then((data) => console.log(data));
+        } catch (error) {
+            console.log(error)
+        }
     }, []);
 
     const submitReservationHandler = async () => {
         try {
             const reservationBody: ReservationBody = {
                 email,
-                phone: guestPhone as number,
-                name: guestName,
-                time: selectedTime,
+                phone: phone ? phone : 0,
+                name: fullName,
+                time: new Date(selectedTime),
             };
 
             const response = await fetch("/api/reservation", {
@@ -66,14 +62,6 @@ function Reservation(props: ReservationProps) {
                 <main>
                     <ReservationForm
                         submitReservationHandler={submitReservationHandler}
-                        email={email}
-                        setEmail={setEmail}
-                        guests={guestNumber}
-                        setGuests={setGuestNumber}
-                        guestName={guestName}
-                        setName={setGuestName}
-                        phone={guestPhone}
-                        setPhone={setGuestPhone}
                     />
                 </main>
             </Layout>

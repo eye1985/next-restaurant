@@ -1,12 +1,13 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { connectToDB } from "@/lib/db";
 import { FetchMethods } from "@/enum/fetch-methods";
+import dayjs from "dayjs";
 
 export interface ReservationBody {
     name: string;
     email: string;
     phone: number;
-    time: string;
+    time: Date;
 }
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -24,13 +25,19 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
                 .db("Bao")
                 .collection("reservations");
 
-            const today = new Date();
+            const startDate = new Date(2023,1, 11);
+            const endDate = new Date(2023,1, 12);
 
             const reservations = await collection.find({
                 time : {
-                    $eq : today
+                    $gt: startDate,
+                    $lt:endDate,
                 }
             }).toArray();
+
+            // reservations.forEach(item => {
+            //     console.log(dayjs(item.time).format("DD.MM.YYYY HH:mm"));
+            // })
 
             await client.close();
             res.status(200).json({
@@ -47,7 +54,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
             try {
                 const insert = await collection.insertOne({
                     name: reqBody.name,
-                    time: reqBody.time,
+                    time: new Date(reqBody.time),
                     email: reqBody.email,
                     phone: reqBody.phone,
                 });
