@@ -1,13 +1,15 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { connectToDB } from "@/lib/db";
 import { FetchMethods } from "@/enum/fetch-methods";
-import dayjs from "dayjs";
+import {ObjectId} from "mongodb";
 
 export interface ReservationBody {
     name: string;
     email: string;
     phone: number;
     time: Date;
+    totalGuests: number;
+    _id?: string;
 }
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -22,19 +24,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     switch (req.method) {
         case FetchMethods.GET: {
             try {
-                const collection = client
-                    .db("Bao")
-                    .collection("reservations");
+                const collection = client.db("Bao").collection("reservations");
 
-                const startDate = new Date(2023,1, 11);
-                const endDate = new Date(2023,1, 12);
+                const startDate = new Date(2023, 1, 11);
+                const endDate = new Date(2023, 1, 12);
 
-                const reservations = await collection.find({
-                    time : {
-                        $gt: startDate,
-                        $lt:endDate,
-                    }
-                }).toArray();
+                const reservations = await collection.find({}).toArray();
 
                 // reservations.forEach(item => {
                 //     console.log(dayjs(item.time).format("DD.MM.YYYY HH:mm"));
@@ -44,7 +39,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
                 res.status(200).json({
                     reservations: reservations,
                 });
-            }catch (error){
+            } catch (error) {
                 await client.close();
                 res.status(500).json({
                     message: "Failed to retrieve collection ",
@@ -55,7 +50,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
             break;
         }
 
-        case FetchMethods.POST:
+        case FetchMethods.POST: {
             const collection = client.db("Bao").collection("reservations");
             const reqBody: ReservationBody = req.body;
 
@@ -73,27 +68,38 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
                     message: `${insert.insertedId} created`,
                 });
             } catch (error) {
-
                 await client.close();
                 res.status(500).json({
                     message: `Failed to create record`,
                 });
             }
             break;
+        }
         case FetchMethods.PUT:
             res.status(200).json({
                 message: `Resource updated`,
             });
             break;
-        case FetchMethods.DELETE:
-            res.status(204).json({
-                message: `Delete created`,
-            });
+        case FetchMethods.DELETE: {
+            try {
+                const collection = client.db("Bao").collection("reservations");
+                await collection.deleteOne({
+                    _id: new ObjectId(req.body.id),
+                });
+
+                await client.close();
+                res.status(204).end();
+            } catch (error) {
+                await client.close();
+                res.status(500).json({
+                    message: `Could not delete ${req.body._id}`,
+                });
+            }
+
             break;
+        }
         case FetchMethods.PATCH:
-            res.status(204).json({
-                message: `Resource patched`,
-            });
+            res.status(204).end();
             break;
         default:
             res.status(405).json({

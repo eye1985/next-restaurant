@@ -199,7 +199,7 @@ function ReservationForm(props: ReservationFormProps) {
                         onRequestClose={closeModal}
                         style={customStyles}
                         shouldCloseOnOverlayClick={false}
-                        contentLabel="Example Modal"
+                        contentLabel="Confirm reservation"
                     >
                         <div className={classes.modal}>
                             <p>The table will be reserved for {fullName}.</p>

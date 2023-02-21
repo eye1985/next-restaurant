@@ -8,20 +8,20 @@ import {ReservationBody} from "@/pages/api/reservation";
 import {ReservationContext} from "@/context/reservation-context-provider";
 
 function Reservation() {
-    const {selectedTime, phone, fullName, email} =
+    const {selectedTime, phone, fullName, email, totalGuests} =
         useContext(ReservationContext);
 
-    useEffect(() => {
-        try {
-            fetch("/api/reservation", {
-                method: "get",
-            })
-                .then((res) => res.json())
-                .then((data) => console.log(data));
-        } catch (error) {
-            console.log(error)
-        }
-    }, []);
+    // useEffect(() => {
+    //     try {
+    //         fetch("/api/reservation", {
+    //             method: "get",
+    //         })
+    //             .then((res) => res.json())
+    //             .then((data) => console.log(data));
+    //     } catch (error) {
+    //         console.log(error)
+    //     }
+    // }, []);
 
     const submitReservationHandler = async () => {
         try {
@@ -29,6 +29,7 @@ function Reservation() {
                 email,
                 phone: phone ? phone : 0,
                 name: fullName,
+                totalGuests,
                 time: new Date(selectedTime),
             };
 
