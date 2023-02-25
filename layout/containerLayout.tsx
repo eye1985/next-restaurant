@@ -1,11 +1,11 @@
-import {ReactElement, ReactNode} from "react";
-import classes from "./layout.module.css";
+import {ReactNode} from "react";
+import classes from "./container-layout.module.css";
 
 interface LayoutProps {
     children : ReactNode | ReactNode[]
 }
 
-function Layout(props:LayoutProps){
+function ContainerLayout(props:LayoutProps){
     return (
         <div className={classes.container}>
             {props.children}
@@ -13,4 +13,4 @@ function Layout(props:LayoutProps){
     )
 }
 
-export default Layout;
+export default ContainerLayout;

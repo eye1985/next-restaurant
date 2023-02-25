@@ -1,0 +1,17 @@
+.reservationItem{
+    padding:20px;
+    background:hsla(0, 100%, 100%, 1);
+    margin-bottom:20px;
+    box-shadow: 0 0  10px var(--box-shadow-color);
+    border: 1px solid var(--reservation-item-border-color);
+}
+
+.reservationItem:last-child{
+    margin-bottom:0;
+}
+
+@media (min-width:720px){
+    :is(.reservationItem:last-child){
+        margin-bottom:40px;
+    }
+}

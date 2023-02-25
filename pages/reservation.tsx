@@ -1,27 +1,16 @@
 import Head from "next/head";
 
-import Layout from "@/layout/layout";
+import ContainerLayout from "@/layout/containerLayout";
 import HeaderTitle from "@/components/header-title";
 import ReservationForm from "@/components/reservation/reservation-form";
-import {useContext, useEffect} from "react";
+import {useContext} from "react";
 import {ReservationBody} from "@/pages/api/reservation";
 import {ReservationContext} from "@/context/reservation-context-provider";
+import {ZodError} from "zod";
 
 function Reservation() {
     const {selectedTime, phone, fullName, email, totalGuests} =
         useContext(ReservationContext);
-
-    // useEffect(() => {
-    //     try {
-    //         fetch("/api/reservation", {
-    //             method: "get",
-    //         })
-    //             .then((res) => res.json())
-    //             .then((data) => console.log(data));
-    //     } catch (error) {
-    //         console.log(error)
-    //     }
-    // }, []);
 
     const submitReservationHandler = async () => {
         try {
@@ -31,6 +20,7 @@ function Reservation() {
                 name: fullName,
                 totalGuests,
                 time: new Date(selectedTime),
+                timeOfReservation: new Date(),
             };
 
             const response = await fetch("/api/reservation", {
@@ -41,11 +31,14 @@ function Reservation() {
                 body: JSON.stringify(reservationBody),
             });
 
-            if (!response.ok) {
-                throw new Error("Could not reserve a table");
+            if(!response.ok){
+                const {error} = await response.json();
+                return error as ZodError;
             }
+
+            return true;
         } catch (error) {
-            console.error(error);
+            return error as ZodError;
         }
     };
 
@@ -58,14 +51,14 @@ function Reservation() {
                     content="Reservation for Bao restaurant"
                 />
             </Head>
-            <Layout>
+            <ContainerLayout>
                 <HeaderTitle>Reservation</HeaderTitle>
                 <main>
                     <ReservationForm
                         submitReservationHandler={submitReservationHandler}
                     />
                 </main>
-            </Layout>
+            </ContainerLayout>
         </>
     );
 }

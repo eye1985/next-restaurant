@@ -1,0 +1,13 @@
+.sectionHeader{
+    font-size:1.8rem;
+    font-weight:300;
+    margin-bottom:10px;
+    border-bottom: 1px solid hsla(0, 0%, 0%, 1);
+    display:inline-block;
+}
+
+@media (min-width: 720px){
+    .sectionHeader{
+        margin-bottom:20px;
+    }
+}

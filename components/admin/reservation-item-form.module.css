@@ -1,0 +1,74 @@
+.reservationFormContainer{
+    container-type: inline-size;
+    container-name: reservationFormContainer;
+}
+
+.reservationFormGrid{
+    display: grid;
+    grid-template-columns: 1fr;
+}
+
+.textRow{
+    margin-bottom:10px;
+    display: block;
+    line-height: 1.4;
+}
+
+.textRow > strong {
+    font-weight:300;
+}
+
+.buttonContainer{
+    display: flex;
+    flex-direction: column-reverse;
+    margin-top:30px;
+}
+
+.textRow :is(span, strong, time){
+    display:block;
+}
+
+.textRow > strong{
+    font-size:1.4rem;
+}
+
+.textRow .oneLine :is(time, span){
+    display: inline-block;
+}
+
+.textRow .oneLine span svg{
+    margin-right:5px;
+}
+.textRow .oneLine time{
+    margin-right:10px;
+}
+
+.textRow .oneLine .iconAndNumber{
+    display: flex;
+    align-items: center;
+    position: relative;
+    top:1px;
+}
+
+@container reservationFormContainer (min-width: 400px){
+    .reservationFormGrid{
+        grid-template-columns: 1fr 2fr;
+    }
+
+    .importantRow{
+        font-weight:600;
+        font-size:1.8rem;
+    }
+
+    .notImportantRow{
+        font-weight:300;
+        font-style:italic;
+        font-size:1.2rem;
+    }
+
+    .timeContent{
+        display: grid;
+        align-items: center;
+        justify-content: center;
+    }
+}

@@ -1,7 +1,7 @@
 import Head from "next/head";
 import MenuList from "@/components/menu/menu-list";
 import HeaderTitle from "@/components/header-title";
-import Layout from "@/layout/layout";
+import ContainerLayout from "@/layout/containerLayout";
 
 function Menu() {
     return (
@@ -11,12 +11,12 @@ function Menu() {
                 <meta name="description" content="Menu for Bao restaurant" />
             </Head>
 
-            <Layout>
+            <ContainerLayout>
                 <HeaderTitle>À la carte</HeaderTitle>
                 <main>
                     <MenuList />
                 </main>
-            </Layout>
+            </ContainerLayout>
         </>
     );
 }

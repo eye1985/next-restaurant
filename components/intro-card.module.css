@@ -9,6 +9,11 @@
     width:100%;
 }
 
+.grid{
+    margin-bottom:40px;
+    box-shadow: 0 0  10px var(--box-shadow-color);
+}
+
 .introCard h2{
     font-weight: 600;
     font-size:1.8rem;
@@ -16,7 +21,6 @@
 }
 
 .text{
-    --introCard-bg:hsla(0, 100%, 100%, .7);
     line-height:1.5;
     font-weight:500;
     font-size:1.6rem;
@@ -43,7 +47,6 @@
         display:grid;
         grid-template-columns: 1fr 1fr;
         margin-bottom:60px;
-        box-shadow: 0 0  10px var(--box-shadow-color);
     }
 
     .introCard h2{

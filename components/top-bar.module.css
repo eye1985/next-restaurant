@@ -1,14 +1,15 @@
 .menu {
-    --menubg:hsla(0, 100%, 100%, 0);
+    --menubg: hsla(0, 100%, 100%, 0);
     position: relative;
     z-index: 1;
     background: var(--menubg);
-    width:100%;
+    width: 100%;
 }
 
 .menu ul {
     display: flex;
     flex-direction: row-reverse;
+    flex-wrap:wrap;
 }
 
 .menu li {
@@ -16,26 +17,33 @@
     padding: 20px;
 }
 
-.active,
-.menu a:hover{
-    border-bottom: 1px solid hsl(0,0%,0%,100);
+.menu button {
+    background: transparent;
+    border: 0;
+    font-size: 1.6rem;
+    font-family: 'Montserrat', sans-serif;
 }
 
-.home{
-    margin-right:auto;
+:is(.active,.menu a:hover, .menu button:hover) {
+    border-bottom: 1px solid hsl(0, 0%, 0%, 100);
+    cursor: pointer;
 }
 
-@media (min-width:720px){
-    .menu{
-        padding:0 40px;
+.home {
+    margin-right: auto;
+}
+
+@media (min-width: 720px) {
+    .menu {
+        padding: 0 40px;
     }
 
     .menu li:last-child {
-        padding-left:0;
+        padding-left: 0;
     }
 
     .menu li:first-child {
-        padding-right:0;
+        padding-right: 0;
     }
 }
 

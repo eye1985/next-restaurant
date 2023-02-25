@@ -5,17 +5,29 @@ import NumberSelector from "@/components/reservation/number-selector";
 import { SelectSingleEventHandler } from "react-day-picker";
 import Modal from "react-modal";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
 import { ReservationContext } from "@/context/reservation-context-provider";
-import errorClasses from "@/styles/utils/error.module.css";
+import reactModalClasses from "@/styles/react-modal.module.css";
+import Button from "@/components/form/button";
+import FormInput from "@/components/form/form-elements/form-input";
+import FormLabel from "@/components/form/form-elements/form-label";
+import FormRow from "@/components/form/form-elements/form-row";
+import FormElements from "@/components/form/form-elements/form-elements";
+import { ZodError } from "zod";
+import FormErrorLabel from "@/components/form/form-elements/form-error-label";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 interface ReservationFormProps {
-    submitReservationHandler: () => void;
+    submitReservationHandler: () => Promise<boolean | ZodError>;
 }
 
 function ReservationForm(props: ReservationFormProps) {
-    const [hasEmailError, setHasEmailError] = useState(false);
-    const [hasFullNameError, setHasFullNameError] = useState(false);
-    const [hasPhoneError, setHasPhoneError] = useState(false);
+    const [emailError, setEmailError] = useState("");
+    const [fullNameError, setFullNameError] = useState("");
+    const [phoneError, setPhoneError] = useState("");
     const [modalIsOpen, setIsOpen] = useState(false);
     const [displayForm, setDisplayForm] = useState(true);
 
@@ -28,7 +40,6 @@ function ReservationForm(props: ReservationFormProps) {
         setTotalGuests,
         setPhoneNumber,
         setFullName,
-        timeError,
         phone,
         totalGuests,
         email,
@@ -72,25 +83,25 @@ function ReservationForm(props: ReservationFormProps) {
     const submitFormHandler = (event: FormEvent) => {
         event.preventDefault();
 
-        setHasEmailError(false);
+        setEmailError("");
         setTimeError(false); // TODO refactor this?
-        setHasFullNameError(false);
-        setHasPhoneError(false);
+        setFullNameError("");
+        setPhoneError("");
 
         if (!selectedTime) {
             setTimeError(true);
         }
 
         if (!email) {
-            setHasEmailError(true);
+            setEmailError("Please input a correct e-mail address");
         }
 
         if (!fullName) {
-            setHasFullNameError(true);
+            setFullNameError("Please input your name");
         }
 
         if (!phone) {
-            setHasPhoneError(true);
+            setPhoneError("Please input your phone number");
         }
 
         if (!email || !phone || !fullName || !selectedTime) {
@@ -100,8 +111,31 @@ function ReservationForm(props: ReservationFormProps) {
         openModal();
     };
 
-    const submitHandler = () => {
-        props.submitReservationHandler();
+    const submitHandler = async () => {
+        const res = await props.submitReservationHandler();
+
+        if (typeof res !== "boolean") {
+            closeModal();
+            res.issues.forEach((issue) => {
+                switch (issue.path[0]) {
+                    case "email":
+                        setEmailError(issue.message);
+                        break;
+                    case "name":
+                        setFullNameError(issue.message);
+                        break;
+                    case "phone":
+                        setPhoneError(issue.message);
+                        break;
+                    default:
+                        //TODO add global error message
+                        console.log(issue.message);
+                        break;
+                }
+            });
+
+            return;
+        }
         setDisplayForm(false);
         setFullName("");
         setPhoneNumber(null);
@@ -130,67 +164,62 @@ function ReservationForm(props: ReservationFormProps) {
                             }
                             radioChangeHandler={radioChangeHandler}
                         />
+                        <FormElements>
+                            <FormRow>
+                                <FormLabel htmlFor="email">E-mail:</FormLabel>
+                                <FormInput
+                                    id="email"
+                                    type="email"
+                                    value={email}
+                                    onChange={(event) => {
+                                        setEmail(event.target.value);
+                                    }}
+                                    placeholder="youremail@provider.com"
+                                />
+                                {emailError ? (
+                                    <FormErrorLabel message={emailError} />
+                                ) : null}
+                            </FormRow>
 
-                        <div className={classes.formControl}>
-                            <label htmlFor="email">E-mail:</label>
-                            <input
-                                id="email"
-                                type="email"
-                                value={email}
-                                onChange={(event) => {
-                                    setEmail(event.target.value);
-                                }}
-                                placeholder="youremail@provider.com"
-                            />
-                            {hasEmailError ? (
-                                <p className={errorClasses.errorText}>
-                                    Please input a correct e-mail address
-                                </p>
-                            ) : null}
-                        </div>
+                            <FormRow>
+                                <FormLabel htmlFor="name">Name:</FormLabel>
+                                <FormInput
+                                    id="name"
+                                    type="text"
+                                    placeholder="John Smith"
+                                    value={fullName}
+                                    onChange={(event) => {
+                                        setFullName(event.target.value);
+                                    }}
+                                />
+                                {fullNameError ? (
+                                    <FormErrorLabel message={fullNameError} />
+                                ) : null}
+                            </FormRow>
 
-                        <div className={classes.formControl}>
-                            <label htmlFor="name">Name:</label>
-                            <input
-                                id="name"
-                                type="text"
-                                placeholder="John Smith"
-                                value={fullName}
-                                onChange={(event) => {
-                                    setFullName(event.target.value);
-                                }}
-                            />
-                            {hasFullNameError ? (
-                                <p className={errorClasses.errorText}>
-                                    Please input your name
-                                </p>
-                            ) : null}
-                        </div>
-
-                        <div className={classes.formControl}>
-                            <label htmlFor="phone">Phone:</label>
-                            <input
-                                id="phone"
-                                type="number"
-                                placeholder="99 99 99 99"
-                                value={phone ? (phone as number) : ""}
-                                onChange={(event) => {
-                                    setPhoneNumber(
-                                        parseInt(event.target.value)
-                                    );
-                                }}
-                            />
-                            {hasPhoneError ? (
-                                <p className={errorClasses.errorText}>
-                                    Please input your phone number
-                                </p>
-                            ) : null}
-                        </div>
+                            <FormRow>
+                                <FormLabel htmlFor="phone">Phone:</FormLabel>
+                                <FormInput
+                                    id="phone"
+                                    type="number"
+                                    placeholder="99 99 99 99"
+                                    value={phone ? (phone as number) : ""}
+                                    onChange={(event) => {
+                                        setPhoneNumber(
+                                            parseInt(event.target.value)
+                                        );
+                                    }}
+                                />
+                                {phoneError ? (
+                                    <FormErrorLabel message={phoneError} />
+                                ) : null}
+                            </FormRow>
+                        </FormElements>
 
                         <div className={classes.submitContainer}>
-                            <button className={classes.submit}>
+                            <Button primary>
                                 Reserve for two hours
-                            </button>
+                            </Button>
                         </div>
                     </form>
 
@@ -221,9 +250,13 @@ function ReservationForm(props: ReservationFormProps) {
                                 </a>
                             </p>
 
-                            <div className={classes.modalButtons}>
-                                <button onClick={submitHandler}>Confirm</button>
-                                <button onClick={closeModal}>Cancel</button>
+                            <div className={reactModalClasses.buttonContainer}>
+                                <Button onClick={submitHandler} primary full>
+                                    Confirm
+                                </Button>
+                                <Button onClick={closeModal} full>
+                                    Cancel
+                                </Button>
                             </div>
                         </div>
                     </Modal>

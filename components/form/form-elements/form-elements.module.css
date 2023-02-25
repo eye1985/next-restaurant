@@ -1,0 +1,32 @@
+.formLabel{
+    font-weight: 500;
+    font-size:1.4rem;
+    display: block;
+}
+
+.formInput{
+    padding:10px;
+    width:100%;
+    font-size:1.4rem;
+    border: 1px solid hsla(0, 0%, 0%, 1);
+}
+
+.formControl .formLabel{
+    margin-bottom: 5px;
+}
+
+.formRow{
+    margin-bottom:20px;
+}
+
+@media (min-width:720px){
+    .formLabel{
+        font-size:1.6rem;
+        display: block;
+        font-weight: 300;
+    }
+
+    .formInput{
+        font-size:1.6rem;
+    }
+}

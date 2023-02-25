@@ -1,7 +1,8 @@
 import classes from "./top-bar.module.css";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import Layout from "@/layout/layout";
+import ContainerLayout from "@/layout/containerLayout";
+import { signOut, useSession } from "next-auth/react";
 
 function TopBar() {
     const router = useRouter();
@@ -13,19 +14,24 @@ function TopBar() {
         }
     };
 
+    const { data: session } = useSession();
+
     return (
         <nav className={classes.menu}>
-            <Layout>
+            <ContainerLayout>
                 <ul>
-                    {/*<li>*/}
-                    {/*    <Link*/}
-                    {/*        className={activeLinkClass("/login")}*/}
-                    {/*        href="/login"*/}
-                    {/*        title="Login"*/}
-                    {/*    >*/}
-                    {/*        Login*/}
-                    {/*    </Link>*/}
-                    {/*</li>*/}
+                    {session ? (
+                        <li>
+                            <button
+                                title="Log out"
+                                onClick={() => {
+                                    signOut();
+                                }}
+                            >
+                                Logout
+                            </button>
+                        </li>
+                    ) : null}
 
                     <li>
                         <Link
@@ -53,7 +59,7 @@ function TopBar() {
                         </Link>
                     </li>
                 </ul>
-            </Layout>
+            </ContainerLayout>
         </nav>
     );
 }

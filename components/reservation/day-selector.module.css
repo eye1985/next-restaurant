@@ -37,8 +37,8 @@
 
 .customRoot{
     --rdp-cell-size: 40px;
-    --rdp-accent-color: #0000ff;
-    --rdp-background-color: #e7edff;
+    --rdp-accent-color: hsla(180deg, 100%, 13%,1);
+    --rdp-background-color: hsl(180, 79%, 92%);
     --rdp-accent-color-dark: #3003e1;
     --rdp-background-color-dark: #180270;
     --rdp-outline: 2px solid var(--rdp-accent-color);

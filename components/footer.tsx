@@ -1,10 +1,10 @@
 import classes from "./footer.module.css";
-import Layout from "@/layout/layout";
+import ContainerLayout from "@/layout/containerLayout";
 
 function Footer() {
     return (
         <footer className={classes.footer}>
-            <Layout>
+            <ContainerLayout>
                 <div className={classes.flex}>
                     <article className={classes.openingHours}>
                         <h2>
@@ -34,7 +34,7 @@ function Footer() {
                         </address>
                     </article>
                 </div>
-            </Layout>
+            </ContainerLayout>
         </footer>
     );
 }

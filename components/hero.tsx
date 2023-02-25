@@ -13,6 +13,7 @@ function Hero(props: HeroProps) {
             <Image
                 src={"/assets/img/bun.jpg"}
                 alt="bun"
+                priority
                 fill={true}
                 style={{
                     objectFit: "cover",

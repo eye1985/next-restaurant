@@ -6,9 +6,14 @@ import {
 import styles from "react-day-picker/dist/style.module.css";
 import dayjs from "dayjs";
 import classes from "./day-selector.module.css";
-import errorClasses from "@/styles/utils/error.module.css";
 import { ChangeEvent, useContext } from "react";
 import { ReservationContext } from "@/context/reservation-context-provider";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+import FormErrorLabel from "@/components/form/form-elements/form-error-label";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 interface DaySelectorProps {
     className?: string;
@@ -29,6 +34,7 @@ function DaySelector(props: DaySelectorProps) {
     ) => {
         let tempLoop = 0;
         let tempTime = dayjs(selectedDate)
+            .tz("Europe/Oslo")
             .set("hour", hour)
             .set("minute", min)
             .set("second", 0);
@@ -101,9 +107,7 @@ function DaySelector(props: DaySelectorProps) {
                             )}
                         </div>
                         {timeError ? (
-                            <p className={errorClasses.errorText}>
-                                Please select a time
-                            </p>
+                            <FormErrorLabel message="Please select a time" />
                         ) : null}
                     </div>
                 ) : null}

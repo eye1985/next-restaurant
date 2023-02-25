@@ -1,89 +1,55 @@
-.reservationForm{
-    background:var(--reservation-form-bg);
-    padding:20px;
-}
-
-.formControl{
-    display:flex;
-    flex-direction:column;
-    margin-bottom:20px;
-}
-
-.formControl label{
-    margin-bottom:5px;
-}
-.formControl input{
-    padding: 8px;
-}
-
-.margin{
-    margin-bottom:20px;
-}
-
-.submitContainer{
-    display: flex;
-    justify-content: center;
-    margin-top:40px;
-}
-
-.submit{
-    padding: 6px 20px;
-    margin-top:10px;
-    background:#fff;
-}
-
-.receipt{
-    background:hsla(0, 100%, 100%,1);
+.reservationForm {
+    background: var(--reservation-form-bg);
     padding: 20px;
 }
 
-.receipt h1{
-    font-size:1.8rem;
-    margin-bottom:20px;
+.margin {
+    margin-bottom: 20px;
+}
+
+.submitContainer {
+    display: flex;
+    justify-content: center;
+    margin-top: 40px;
+}
+
+.receipt {
+    background: hsla(0, 100%, 100%, 1);
+    padding: 20px;
+}
+
+.receipt h1 {
+    font-size: 1.8rem;
+    margin-bottom: 20px;
 }
 
 .receipt,
-.modal{
+.modal {
     line-height: 1.5;
     font-size: 1.4rem;
     font-weight: 400;
 }
+
 .receipt p,
-.modal p{
+.modal p {
     margin-bottom: 10px;
 }
 
 .receipt time,
-.modal time{
-    font-weight:600;
+.modal time {
+    font-weight: 600;
     display: block;
 }
 
-.modalButtons{
-    display: flex;
-    justify-content: center;
-    margin-top:20px;
-}
-
-.modalButtons button{
-    background:hsla(0, 100%, 100%, 1);
-    border: 1px solid;
-    padding: 10px 18px;
-}
-
-.modalButtons button:last-child{
-    margin-left:14px;
-}
-
-@media (min-width:720px){
-    .modal{
+@media (min-width: 720px) {
+    .modal {
         padding: 20px;
     }
 
     .receipt,
-    .reservationForm{
-        padding:40px;
-        margin-bottom:60px;
-        box-shadow: 0 0  10px var(--box-shadow-color);
+    .reservationForm {
+        padding: 40px;
+        margin-bottom: 60px;
+        box-shadow: 0 0 10px var(--box-shadow-color);
     }
 }

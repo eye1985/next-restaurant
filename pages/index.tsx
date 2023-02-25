@@ -1,8 +1,6 @@
-import Head from "next/head";
 import Hero from "@/components/hero";
-import Layout from "@/layout/layout";
+import ContainerLayout from "@/layout/containerLayout";
 import IntroCard, { Direction } from "@/components/intro-card";
-import utilClassName from "@/styles/utils/spacing.module.css";
 
 export default function Home() {
     const restaurantIntro = [
@@ -20,18 +18,9 @@ export default function Home() {
 
     return (
         <>
-            <Head>
-                <title>Bao</title>
-                <meta name="description" content="Asiatisk mat" />
-                <meta
-                    name="viewport"
-                    content="width=device-width, initial-scale=1"
-                />
-                <link rel="icon" href="/favicon.ico" />
-            </Head>
             <Hero title="Bao" char="包" />
             <main>
-                <Layout>
+                <ContainerLayout>
                     <IntroCard
                         title="Our restaurant"
                         imageSrc="overhead.jpg"
@@ -48,7 +37,7 @@ export default function Home() {
                         desc={chefIntro}
                         textAlign={Direction.Left}
                     />
-                </Layout>
+                </ContainerLayout>
             </main>
         </>
     );
