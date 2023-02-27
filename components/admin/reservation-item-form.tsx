@@ -4,11 +4,11 @@ import { ReservationEditable } from "@/pages/admin";
 import classes from "./reservation-item-form.module.css";
 import { BsFillPeopleFill } from "react-icons/bs";
 import {formatDate} from "@/utils/date";
+import Link from "next/link";
 
 interface ReservationItemFormProps {
     submitHandler: (event: FormEvent) => void;
     reservation: ReservationEditable;
-    toggleEditHandler: (event: MouseEvent) => void;
     deleteModalHandler: (event: MouseEvent) => void;
     deleteHandler: (event: MouseEvent) => void;
 }
@@ -17,7 +17,6 @@ function ReservationItemForm(props: ReservationItemFormProps) {
     const {
         submitHandler,
         reservation,
-        toggleEditHandler,
         deleteModalHandler,
     } = props;
     return (
@@ -87,29 +86,11 @@ function ReservationItemForm(props: ReservationItemFormProps) {
                 </div>
             </div>
 
-            {reservation.isEdit ? (
-                <div>
-                    <Button type="submit">Submit change</Button>
-
-                    <Button
-                        type="button"
-                        data-enable="false"
-                        onClick={toggleEditHandler}
-                        data-id={reservation._id}
-                    >
-                        Cancel
-                    </Button>
-                </div>
-            ) : (
+            {reservation.isEdit ? null : (
                 <div className={classes.buttonContainer}>
-                    {/*<Button*/}
-                    {/*    type="button"*/}
-                    {/*    onClick={toggleEditHandler}*/}
-                    {/*    data-enable="true"*/}
-                    {/*    data-id={reservation._id}*/}
-                    {/*>*/}
-                    {/*    Edit*/}
-                    {/*</Button>*/}
+                    <Link href={`/admin/edit/${reservation._id}`} title="Edit">
+                        Edit
+                    </Link>
 
                     <Button
                         type="button"

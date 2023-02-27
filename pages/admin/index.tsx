@@ -16,6 +16,7 @@ import ReservationItemForm from "@/components/admin/reservation-item-form";
 import Button from "@/components/form/button";
 import reactModalClasses from "@/styles/react-modal.module.css";
 import NotificationBar from "@/components/notifications/notification-bar";
+import {BASE_URI} from "@/utils/uri";
 
 interface Reservation {
     _id: string;
@@ -83,37 +84,12 @@ function AdminPage(props: AdminProps) {
         setIsOpen(false);
     }
 
-    const toggleEditInReservations = (id: string, isEdit: boolean) => {
-        // return reservations.map((reservation) => {
-        //     if (reservation._id === id) {
-        //         reservation.isEdit = isEdit;
-        //     }
-        //     return reservation;
-        // });
-    };
-
     const deleteModalHandler = (event: MouseEvent) => {
         const id = (event.target as HTMLButtonElement).getAttribute("data-id");
         if (id) {
             setCurrentToDeleteReservationId(id);
         }
         openModal();
-    };
-
-    const toggleEditHandler = (event: MouseEvent) => {
-        event.preventDefault();
-        const id = (event.target as HTMLButtonElement).getAttribute("data-id");
-        let isEdit = false;
-        const isEnabled = (event.target as HTMLButtonElement).getAttribute(
-            "data-enable"
-        );
-        if (isEnabled === "true") {
-            isEdit = true;
-        }
-        if (id) {
-            const editReservation = toggleEditInReservations(id, isEdit);
-            // setReservations(editReservation);
-        }
     };
 
     const deleteHandler = async () => {
@@ -165,11 +141,6 @@ function AdminPage(props: AdminProps) {
             })
                 .then((res) => res.json())
                 .then((data) => console.log(data));
-        }
-
-        if (id) {
-            const editReservation = toggleEditInReservations(id, false);
-            // setReservations(editReservation);
         }
     };
 
@@ -235,8 +206,8 @@ function AdminPage(props: AdminProps) {
                 <HeaderTitle>Admin</HeaderTitle>
                 <main>
                     <AdminDescription>
-                        All reservation prior to today&apos;s date are automatically
-                        deleted. <strong>(Not yet implemented)</strong>
+                        All reservation prior to today&apos;s date are
+                        automatically deleted.
                     </AdminDescription>
 
                     {reservationState.length === 0 ? (
@@ -268,9 +239,6 @@ function AdminPage(props: AdminProps) {
                                                     reservation={reservation}
                                                     submitHandler={
                                                         submitHandler
-                                                    }
-                                                    toggleEditHandler={
-                                                        toggleEditHandler
                                                     }
                                                     deleteModalHandler={
                                                         deleteModalHandler
@@ -320,9 +288,6 @@ function AdminPage(props: AdminProps) {
 export default AdminPage;
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-    const uri = process.env.VERCEL_URL
-        ? `https://${process.env.VERCEL_URL}`
-        : process.env.BASE_ORIGIN;
     let reservations: Reservation[] = [];
     const session = await getServerSession(
         context.req,
@@ -339,9 +304,10 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         };
     }
 
+    //TODO refactor this, no need to call api. Can directly access DB logic
     try {
         const response = await fetch(
-            `${uri}/api/reservation?prepareInitialReservation=true`,
+            `${BASE_URI}/api/reservation?prepareInitialReservation=true`,
             {
                 method: "get",
             }

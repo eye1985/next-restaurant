@@ -1,6 +1,7 @@
 import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import {connectToDB, getAdminUser} from "@/lib/db";
+import {MongoClient} from "mongodb";
 
 export const authOptions: NextAuthOptions = {
     secret: process.env.AUTH_SECRET,
@@ -38,12 +39,12 @@ export const authOptions: NextAuthOptions = {
                 }
                 const { username, password } = credentials;
 
-                const client = await connectToDB();
+                const [client] = await connectToDB();
                 if (!client) {
                     throw new Error("Could not cannot to database");
                 }
 
-                const adminUser = await getAdminUser(client, username, password);
+                const adminUser = await getAdminUser(client as MongoClient, username, password);
                 if(!adminUser){
                     throw new Error("Incorrect username or password");
                 }

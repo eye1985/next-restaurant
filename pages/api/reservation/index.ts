@@ -20,8 +20,8 @@ interface PutReservationBody {
 }
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
-    const client = await connectToDB();
-    if (!client) {
+    const [client, errorObj] = await connectToDB();
+    if (errorObj) {
         res.status(500).json({
             message: `Cannot connect to DB`,
         });
