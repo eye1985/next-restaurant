@@ -21,17 +21,39 @@ function TopBar() {
             <ContainerLayout>
                 <ul>
                     {session ? (
+                        <>
+                            <li>
+                                <button
+                                    title="Log out"
+                                    onClick={() => {
+                                        signOut();
+                                    }}
+                                >
+                                    Logout
+                                </button>
+                            </li>
+
+                            <li>
+                                <Link
+                                    className={activeLinkClass("/admin")}
+                                    href="/admin"
+                                    title="Administration page"
+                                >
+                                    Admin
+                                </Link>
+                            </li>
+                        </>
+                    ) : (
                         <li>
-                            <button
-                                title="Log out"
-                                onClick={() => {
-                                    signOut();
-                                }}
+                            <Link
+                                className={activeLinkClass("/login")}
+                                href="/login"
+                                title="For employees"
                             >
-                                Logout
-                            </button>
+                                Login
+                            </Link>
                         </li>
-                    ) : null}
+                    )}
 
                     <li>
                         <Link

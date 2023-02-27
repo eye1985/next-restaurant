@@ -1,9 +1,9 @@
-import dayjs from "dayjs";
 import Button from "@/components/form/button";
 import { FormEvent, MouseEvent } from "react";
 import { ReservationEditable } from "@/pages/admin";
 import classes from "./reservation-item-form.module.css";
 import { BsFillPeopleFill } from "react-icons/bs";
+import {formatDate} from "@/utils/date";
 
 interface ReservationItemFormProps {
     submitHandler: (event: FormEvent) => void;
@@ -61,10 +61,8 @@ function ReservationItemForm(props: ReservationItemFormProps) {
 
                             <span className={classes.oneLine}>
                                 <time>
-                                    {dayjs(reservation.time).format(
-                                        "DD.MM.YYYY"
-                                    )}{" "}
-                                    - {dayjs(reservation.time).format("HH:mm")}
+                                    {formatDate(reservation.time, "DD.MM.YYYY")}{" "}
+                                    - {formatDate(reservation.time, "HH:mm")}
                                 </time>
                                 <span>
                                     <span className={classes.iconAndNumber} title={`${reservation.totalGuests} guests`}>
@@ -80,13 +78,9 @@ function ReservationItemForm(props: ReservationItemFormProps) {
                         >
                             <strong>Registered at</strong>
                             <time>
-                                {dayjs(reservation.timeOfReservation).format(
-                                    "DD.MM.YYYY"
-                                )}{" "}
+                                {formatDate(reservation.timeOfReservation,"DD.MM.YYYY")}{" "}
                                 -{" "}
-                                {dayjs(reservation.timeOfReservation).format(
-                                    "HH:mm"
-                                )}
+                                {formatDate(reservation.timeOfReservation, "HH:mm")}
                             </time>
                         </p>
                     </div>

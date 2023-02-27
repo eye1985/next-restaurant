@@ -235,8 +235,8 @@ function AdminPage(props: AdminProps) {
                 <HeaderTitle>Admin</HeaderTitle>
                 <main>
                     <AdminDescription>
-                        All reservation prior to todays date are automatically
-                        deleted.
+                        All reservation prior to today&apos;s date are automatically
+                        deleted. <strong>(Not yet implemented)</strong>
                     </AdminDescription>
 
                     {reservationState.length === 0 ? (

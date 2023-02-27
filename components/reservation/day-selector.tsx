@@ -11,6 +11,7 @@ import { ReservationContext } from "@/context/reservation-context-provider";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import FormErrorLabel from "@/components/form/form-elements/form-error-label";
+import { dayjsNorway } from "@/utils/date";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -33,8 +34,7 @@ function DaySelector(props: DaySelectorProps) {
         selectedDate: Date
     ) => {
         let tempLoop = 0;
-        let tempTime = dayjs(selectedDate)
-            .tz("Europe/Oslo")
+        let tempTime = dayjsNorway(selectedDate)
             .set("hour", hour)
             .set("minute", min)
             .set("second", 0);
@@ -62,12 +62,31 @@ function DaySelector(props: DaySelectorProps) {
         tfoot: classes.customTfoot,
     };
 
-    const isWeekday = (date: Date) => {
+    const isSundayMonday = (date: Date) => {
         const day = date.getDay();
         return day === 0 || day === 1;
     };
 
-    const disabledDays = [isWeekday, { before: new Date() }];
+    const disabledDays = [isSundayMonday, { before: new Date() }];
+
+    const recursiveFirstAvailableDate = (
+        selectedDate: Date,
+        days: number,
+        check: (date: Date) => boolean
+    ):Date => {
+        if (check(selectedDate)) {
+            const addedDayDate = new Date(selectedDate);
+            addedDayDate.setDate(addedDayDate.getDate() + days);
+            return recursiveFirstAvailableDate(addedDayDate, 1, check);
+        }
+
+        return selectedDate;
+    };
+
+    let selectedDate = selected;
+    if(selected){
+        selectedDate = recursiveFirstAvailableDate(selected, 1, isSundayMonday);
+    }
 
     return (
         <div className={`${classes.daySelector} ${props.className}`}>
@@ -78,7 +97,7 @@ function DaySelector(props: DaySelectorProps) {
                         mode="single"
                         required
                         disabled={disabledDays}
-                        selected={selected}
+                        selected={selectedDate}
                         onSelect={setSelected}
                     />
                 </div>

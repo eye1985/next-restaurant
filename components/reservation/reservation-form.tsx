@@ -16,6 +16,10 @@ import FormRow from "@/components/form/form-elements/form-row";
 import FormElements from "@/components/form/form-elements/form-elements";
 import { ZodError } from "zod";
 import FormErrorLabel from "@/components/form/form-elements/form-error-label";
+import { ColorRing } from "react-loader-spinner";
+import CenterAlign from "@/layout/center-align";
+import spacingClasses from "@/styles/utils/spacing.module.css";
+import { formatDate } from "@/utils/date";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -30,6 +34,7 @@ function ReservationForm(props: ReservationFormProps) {
     const [phoneError, setPhoneError] = useState("");
     const [modalIsOpen, setIsOpen] = useState(false);
     const [displayForm, setDisplayForm] = useState(true);
+    const [confirmLoader, setConfirmLoader] = useState(false);
 
     const {
         selectedTime,
@@ -112,8 +117,9 @@ function ReservationForm(props: ReservationFormProps) {
     };
 
     const submitHandler = async () => {
+        setConfirmLoader(true);
         const res = await props.submitReservationHandler();
-
+        setConfirmLoader(false);
         if (typeof res !== "boolean") {
             closeModal();
             res.issues.forEach((issue) => {
@@ -174,7 +180,7 @@ function ReservationForm(props: ReservationFormProps) {
                                     onChange={(event) => {
                                         setEmail(event.target.value);
                                     }}
-                                    placeholder="youremail@provider.com"
+                                    placeholder="e.g youremail@provider.com"
                                 />
                                 {emailError ? (
                                     <FormErrorLabel message={emailError} />
@@ -186,7 +192,7 @@ function ReservationForm(props: ReservationFormProps) {
                                 <FormInput
                                     id="name"
                                     type="text"
-                                    placeholder="John Smith"
+                                    placeholder="e.g John Smith"
                                     value={fullName}
                                     onChange={(event) => {
                                         setFullName(event.target.value);
@@ -202,7 +208,7 @@ function ReservationForm(props: ReservationFormProps) {
                                 <FormInput
                                     id="phone"
                                     type="number"
-                                    placeholder="99 99 99 99"
+                                    placeholder="e.g 99887766"
                                     value={phone ? (phone as number) : ""}
                                     onChange={(event) => {
                                         setPhoneNumber(
@@ -217,9 +223,7 @@ function ReservationForm(props: ReservationFormProps) {
                         </FormElements>
 
                         <div className={classes.submitContainer}>
-                            <Button primary>
-                                Reserve for two hours
-                            </Button>
+                            <Button primary>Reserve for two hours</Button>
                         </div>
                     </form>
 
@@ -236,7 +240,8 @@ function ReservationForm(props: ReservationFormProps) {
                             <p>
                                 Reserve for {totalGuests} person at{" "}
                                 <time>
-                                    {dayjs(selectedTime).format(
+                                    {formatDate(
+                                        selectedTime,
                                         "DD.MM.YYYY HH:mm"
                                     )}
                                 </time>
@@ -252,7 +257,24 @@ function ReservationForm(props: ReservationFormProps) {
 
                             <div className={reactModalClasses.buttonContainer}>
                                 <Button onClick={submitHandler} primary full>
-                                    Confirm
+                                    <CenterAlign>
+                                        {confirmLoader ? null : "Confirm"}
+
+                                        <ColorRing
+                                            visible={confirmLoader}
+                                            height="18"
+                                            width="18"
+                                            ariaLabel="blocks-loading"
+                                            wrapperClass="blocks-wrapper"
+                                            colors={[
+                                                "#fff",
+                                                "#fff",
+                                                "#fff",
+                                                "#fff",
+                                                "#fff",
+                                            ]}
+                                        />
+                                    </CenterAlign>
                                 </Button>
                                 <Button onClick={closeModal} full>
                                     Cancel
@@ -274,17 +296,28 @@ function ReservationForm(props: ReservationFormProps) {
                         We will be expecting you at:
                         <br />
                         <time>
-                            {dayjs(selectedTime).format("DD.MM.YYYY HH:mm")}
+                            {formatDate(selectedTime, "DD.MM.YYYY HH:mm")}
                         </time>
                     </p>
 
-                    <p>
+                    <p className={spacingClasses.mb40}>
                         If you wish to cancel the reservation please contact us
                         at this phone number:
                         <br />
                         <br />
                         00-00-00-00 (Not a real number)
                     </p>
+
+                    <CenterAlign>
+                        <Button
+                            primary
+                            onClick={() => {
+                                setDisplayForm(true);
+                            }}
+                        >
+                            Back to reservation
+                        </Button>
+                    </CenterAlign>
                 </div>
             )}
         </>

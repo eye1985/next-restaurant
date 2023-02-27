@@ -14,8 +14,14 @@
 }
 
 .receipt {
+    box-shadow: 0 0 10px var(--box-shadow-color);
     background: hsla(0, 100%, 100%, 1);
     padding: 20px;
+}
+
+.reservationForm,
+.receipt{
+    margin-bottom: 40px;
 }
 
 .receipt h1 {
@@ -50,6 +56,5 @@
     .reservationForm {
         padding: 40px;
         margin-bottom: 60px;
-        box-shadow: 0 0 10px var(--box-shadow-color);
     }
 }
