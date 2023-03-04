@@ -1,4 +1,4 @@
-import { MongoClient, ObjectId } from "mongodb";
+import { MongoClient, ObjectId, Document } from "mongodb";
 import * as dotenv from "dotenv";
 import { ReservationDeSerialized } from "@/interfaces/reservation";
 
@@ -40,14 +40,66 @@ export const getAdminUser = async (
 export const getReservation = async (
     client: MongoClient,
     id: string
-): Promise<[res: ReservationDeSerialized |null, err: unknown|null]> => {
-    let reservation:ReservationDeSerialized|null = null;
+): Promise<[res: ReservationDeSerialized | null, err: unknown | null]> => {
+    let reservation: ReservationDeSerialized | null = null;
     let errorObj = null;
     try {
         const reservations = client.db("Bao").collection("reservations");
         reservation = await reservations.findOne<ReservationDeSerialized>({
             _id: new ObjectId(id),
         });
+    } catch (error) {
+        errorObj = error;
+    }
+
+    return [reservation, errorObj];
+};
+
+export const getAggregatedReservation = async (client: MongoClient) => {
+    let reservation: Document[] | null = null;
+    let errorObj = null;
+
+    try {
+        const collection = client.db("Bao").collection("reservations");
+        reservation = await collection
+            .aggregate([
+                {
+                    $group: {
+                        _id: {
+                            $dateToString: {
+                                format: "%d.%m.%Y",
+                                date: "$time",
+                            },
+                        },
+                        count: { $sum: 1 },
+                        reservation: {
+                            $push: {
+                                _id: "$_id",
+                                name: "$name",
+                                time: "$time",
+                                email: "$email",
+                                phone: "$phone",
+                                totalGuests: "$totalGuests",
+                                timeOfReservation: "$timeOfReservation",
+                            },
+                        },
+                    },
+                },
+                {
+                    $project: {
+                        date: "$_id",
+                        count: 1,
+                        _id: 0,
+                        reservation: 1,
+                    },
+                },
+                {
+                    $sort: {
+                        date: 1,
+                    },
+                },
+            ])
+            .toArray();
     } catch (error) {
         errorObj = error;
     }

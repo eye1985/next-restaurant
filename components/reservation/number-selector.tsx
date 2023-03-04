@@ -1,5 +1,7 @@
 import classes from "@/components/reservation/number-selector.module.css";
-import {ChangeEvent, Ref} from "react";
+import {ChangeEvent} from "react";
+import FormLabel from "@/components/form/form-elements/form-label";
+import FormRow from "@/components/form/form-elements/form-row";
 
 interface NumberSelectorProps{
     onChange: (event:ChangeEvent<HTMLSelectElement>)=>void;
@@ -9,8 +11,8 @@ interface NumberSelectorProps{
 function NumberSelector(props:NumberSelectorProps) {
     const selectId = "numberOfPeople";
     return (
-        <div className={classes.select}>
-            <label htmlFor={selectId}>Reserve for</label>
+        <FormRow>
+            <FormLabel htmlFor={selectId}>Total guests</FormLabel>
             <select
                 onChange={props.onChange}
                 className={classes.selectInput}
@@ -26,7 +28,7 @@ function NumberSelector(props:NumberSelectorProps) {
                 <option value="7">7</option>
                 <option value="8">8</option>
             </select>
-        </div>
+        </FormRow>
     );
 }
 

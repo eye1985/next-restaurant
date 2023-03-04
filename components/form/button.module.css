@@ -5,6 +5,7 @@
     border: 1px solid var(--button-border-color);
     color: var(--button-color);
     font-size: 1.4rem;
+    text-align: center;
 }
 
 .button:hover {
@@ -69,8 +70,26 @@
     width: 100%;
 }
 
+.container{
+    display: flex;
+    flex-direction: column;
+    margin-top:30px;
+    row-gap: 12px;
+}
+
 @media (min-width: 720px) {
     .button {
         font-size: 1.6rem;
+    }
+
+    .container{
+        margin-top:60px;
+        flex-direction: row;
+        justify-content: center;
+        column-gap: 20px;
+    }
+
+    .container > .button{
+        min-width: 200px;
     }
 }

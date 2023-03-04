@@ -17,6 +17,11 @@ import DaySelector from "@/components/reservation/day-selector";
 import Panel from "@/components/panel";
 import { dayjsNorway } from "@/utils/date";
 import NotificationBar from "@/components/notifications/notification-bar";
+import FormLabel from "@/components/form/form-elements/form-label";
+import FormRow from "@/components/form/form-elements/form-row";
+import FormElements from "@/components/form/form-elements/form-elements";
+import SubmitButtonContainer from "@/components/form/submit-button-container";
+import {useRouter} from "next/router";
 
 interface EditReservationProps {
     message?: string;
@@ -96,7 +101,10 @@ function EditReservation(props: EditReservationProps) {
         ).toDate(),
     };
 
-    const [errorMessage, setErrorMessage] = useState<null |string>(null);
+    const router = useRouter();
+
+    const [useLoader, setUseLoader] = useState(false);
+    const [errorMessage, setErrorMessage] = useState<null | string>(null);
 
     const [reservation, dispatch] = useReducer(
         reducer,
@@ -105,6 +113,8 @@ function EditReservation(props: EditReservationProps) {
 
     const handleSubmit = async (event: FormEvent) => {
         event.preventDefault();
+        setUseLoader(true);
+        setErrorMessage(null);
 
         try {
             const res = await fetch("/api/reservation", {
@@ -112,14 +122,20 @@ function EditReservation(props: EditReservationProps) {
                 body: JSON.stringify(reservation),
             });
 
-            if(!res.ok){
+            if (!res.ok) {
                 const errorObj = await res.json();
                 setErrorMessage(errorObj.message);
+                setUseLoader(false);
                 console.error(errorObj.error);
+                return;
             }
+
+            await router.push("/admin");
         } catch (error) {
             setErrorMessage("Some unexpected error occurred");
         }
+
+        setUseLoader(false);
     };
 
     return (
@@ -151,56 +167,95 @@ function EditReservation(props: EditReservationProps) {
                                 }}
                             />
 
-                            <FormInput
-                                type="text"
-                                value={reservation.email}
-                                onChange={(event) => {
-                                    dispatch({
-                                        type: ReservationAction.UPDATE_EMAIL,
-                                        payload: event.target.value,
-                                    });
-                                }}
-                            />
+                            <FormElements>
+                                <FormRow>
+                                    <FormLabel htmlFor="email">
+                                        E-mail
+                                    </FormLabel>
+                                    <FormInput
+                                        id="email"
+                                        type="text"
+                                        value={reservation.email}
+                                        onChange={(event) => {
+                                            dispatch({
+                                                type: ReservationAction.UPDATE_EMAIL,
+                                                payload: event.target.value,
+                                            });
+                                        }}
+                                    />
+                                </FormRow>
 
-                            <FormInput
-                                type="text"
-                                value={reservation.name}
-                                onChange={(event) => {
-                                    dispatch({
-                                        type: ReservationAction.UPDATE_NAME,
-                                        payload: event.target.value,
-                                    });
-                                }}
-                            />
+                                <FormRow>
+                                    <FormLabel htmlFor="fullName">
+                                        Name
+                                    </FormLabel>
+                                    <FormInput
+                                        id="fullName"
+                                        type="text"
+                                        value={reservation.name}
+                                        onChange={(event) => {
+                                            dispatch({
+                                                type: ReservationAction.UPDATE_NAME,
+                                                payload: event.target.value,
+                                            });
+                                        }}
+                                    />
+                                </FormRow>
 
-                            <FormInput
-                                type="number"
-                                value={reservation.phone}
-                                onChange={(event) => {
-                                    dispatch({
-                                        type: ReservationAction.UPDATE_PHONE,
-                                        payload: parseInt(event.target.value),
-                                    });
-                                }}
-                            />
+                                <FormRow>
+                                    <FormLabel htmlFor="phone">Phone</FormLabel>
+                                    <FormInput
+                                        id="phone"
+                                        type="number"
+                                        value={reservation.phone}
+                                        onChange={(event) => {
+                                            dispatch({
+                                                type: ReservationAction.UPDATE_PHONE,
+                                                payload: parseInt(
+                                                    event.target.value
+                                                ),
+                                            });
+                                        }}
+                                    />
+                                </FormRow>
 
-                            <FormInput
-                                type="number"
-                                value={reservation.totalGuests}
-                                onChange={(event) => {
-                                    dispatch({
-                                        type: ReservationAction.UPDATE_GUESTS,
-                                        payload: parseInt(event.target.value),
-                                    });
-                                }}
-                            />
+                                <FormRow>
+                                    <FormLabel htmlFor="guests">
+                                        Guests
+                                    </FormLabel>
+                                    <FormInput
+                                        id="guests"
+                                        type="number"
+                                        value={reservation.totalGuests}
+                                        onChange={(event) => {
+                                            dispatch({
+                                                type: ReservationAction.UPDATE_GUESTS,
+                                                payload: parseInt(
+                                                    event.target.value
+                                                ),
+                                            });
+                                        }}
+                                    />
+                                </FormRow>
+                            </FormElements>
 
                             {errorMessage ? (
                                 <NotificationBar message={errorMessage} />
                             ) : null}
 
-                            <Button primary>Edit</Button>
-                            <Link href="/admin">Cancel</Link>
+                            <SubmitButtonContainer>
+                                <Button loader={useLoader} primary>Edit</Button>
+                                <Button
+                                    renderComponent={(btnClass) => (
+                                        <Link
+                                            className={`${btnClass}`}
+                                            href="/admin"
+                                        >
+                                            Cancel
+                                        </Link>
+                                    )}
+                                />
+                            </SubmitButtonContainer>
                         </form>
                     </Panel>
                 </main>
@@ -233,24 +288,17 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
             props: {
                 reservation: {},
                 message: "Could not connect to database or no valid id",
-                error: errorObj,
+                error: JSON.stringify(errorObj),
             },
         };
     }
 
-    const [reservation, reservationError] = await getReservation(
-        client,
-        id as string
-    );
+    const [reservation] = await getReservation(client, id as string);
     await client.close();
 
     if (!reservation) {
         return {
-            props: {
-                reservation: {},
-                message: `Could not fetch ${id}`,
-                error: reservationError,
-            },
+            notFound: true,
         };
     }
 

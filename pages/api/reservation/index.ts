@@ -1,22 +1,21 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { connectToDB } from "@/lib/db";
+import { connectToDB, getAggregatedReservation } from "@/lib/db";
 import { FetchMethods } from "@/enum/fetch-methods";
 import { ObjectId } from "mongodb";
-import {z} from "zod";
-import {ReservationDeSerialized} from "@/interfaces/reservation";
-import {dayjsNorway} from "@/utils/date";
-
+import { z } from "zod";
+import { ReservationDeSerialized } from "@/interfaces/reservation";
+import { dayjsNorway } from "@/utils/date";
 
 const createReservationValidation = () => {
     return z.object({
-        name : z.string().min(2),
+        name: z.string().min(2).regex(/^[^0-9]*$/),
         time: z.string().datetime(),
         email: z.string().email(),
-        phone:z.number().min(8),
-        totalGuests:z.number().min(1).max(8),
-        timeOfReservation:z.string().datetime()
+        phone: z.number().min(8),
+        totalGuests: z.number().min(1).max(8),
+        timeOfReservation: z.string().datetime(),
     });
-}
+};
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
     const [client, errorObj] = await connectToDB();
@@ -53,46 +52,16 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
                         })
                         .toArray();
                 } else if (prepareInitialReservation) {
-                    reservations = await collection
-                        .aggregate([
-                            {
-                                $group: {
-                                    _id: {
-                                        $dateToString: {
-                                            format: "%Y-%m-%d",
-                                            date: "$time",
-                                        },
-                                    },
-                                    count: { $sum: 1 },
-                                    reservation: {
-                                        $push: {
-                                            _id: "$_id",
-                                            name: "$name",
-                                            time: "$time",
-                                            email: "$email",
-                                            phone: "$phone",
-                                            totalGuests: "$totalGuests",
-                                            timeOfReservation:
-                                                "$timeOfReservation",
-                                        },
-                                    },
-                                },
-                            },
-                            {
-                                $project: {
-                                    date: "$_id",
-                                    count: 1,
-                                    _id: 0,
-                                    reservation: 1,
-                                },
-                            },
-                            {
-                                $sort: {
-                                    date: 1,
-                                },
-                            },
-                        ])
-                        .toArray();
+                    const [result, error] = await getAggregatedReservation(
+                        client
+                    );
+                    if (error) {
+                        res.status(500).json({
+                            message: "Failed to retrieve collection",
+                            error,
+                        });
+                    }
+                    reservations = result;
                 } else {
                     reservations = await collection.find({}).toArray();
                 }
@@ -146,7 +115,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
                 await client.close();
                 res.status(500).json({
                     message: `Failed to create record`,
-                    error
+                    error,
                 });
             }
             break;
@@ -163,7 +132,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
                     { _id: new ObjectId(reqBody._id) },
                     {
                         $set: {
-                            name:reqBody.name,
+                            name: reqBody.name,
                             email: reqBody.email,
                             phone: reqBody.phone,
                             time: dayjsNorway(reqBody.time).toDate(),
@@ -180,7 +149,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
                 await client.close();
                 res.status(500).json({
                     message: `Make sure the field constraint are correct`,
-                    error
+                    error,
                 });
             }
             break;
