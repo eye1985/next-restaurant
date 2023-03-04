@@ -2,11 +2,12 @@
 
 This is a demo project of a restaurant site with reservation feature.
 
-View the [demo](https://next-restaurant-eight.vercel.app/).
+View the <a href="https://next-restaurant-eight.vercel.app/" target="_blank">demo</a>.
 
 ## Stack
-- Next.js
+- Next.js 13.x
 - MongoDB Atlas
+- Vercel
 
 ## v1.0.0
 - Mobile responsive
