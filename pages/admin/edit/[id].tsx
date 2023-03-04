@@ -7,9 +7,16 @@ import HeaderTitle from "@/components/header-title";
 import Button from "@/components/form/button";
 import Link from "next/link";
 import { connectToDB, getReservation } from "@/lib/db";
-import { ReservationSerialized } from "@/interfaces/reservation";
+import {
+    ReservationDeSerialized,
+    ReservationSerialized,
+} from "@/interfaces/reservation";
 import FormInput from "@/components/form/form-elements/form-input";
-import { useState } from "react";
+import { FormEvent, useReducer, useState } from "react";
+import DaySelector from "@/components/reservation/day-selector";
+import Panel from "@/components/panel";
+import { dayjsNorway } from "@/utils/date";
+import NotificationBar from "@/components/notifications/notification-bar";
 
 interface EditReservationProps {
     message?: string;
@@ -17,8 +24,103 @@ interface EditReservationProps {
     error: unknown;
 }
 
+enum ReservationAction {
+    UPDATE_EMAIL = "UPDATE_EMAIL",
+    UPDATE_NAME = "UPDATE_NAME",
+    UPDATE_PHONE = "UPDATE_PHONE",
+    UPDATE_GUESTS = "UPDATE_GUESTS",
+    UPDATE_DAY = "UPDATE_DAY",
+    UPDATE_TIME = "UPDATE_TIME",
+}
+
+type Action =
+    | {
+          type: ReservationAction.UPDATE_NAME | ReservationAction.UPDATE_EMAIL;
+          payload: string;
+      }
+    | {
+          type:
+              | ReservationAction.UPDATE_PHONE
+              | ReservationAction.UPDATE_GUESTS;
+          payload: number;
+      }
+    | {
+          type: ReservationAction.UPDATE_DAY | ReservationAction.UPDATE_TIME;
+          payload: Date;
+      };
+
+function reducer(state: ReservationDeSerialized, action: Action) {
+    const { type, payload } = action;
+    switch (type) {
+        case ReservationAction.UPDATE_NAME:
+            return {
+                ...state,
+                name: payload,
+            };
+        case ReservationAction.UPDATE_EMAIL:
+            return {
+                ...state,
+                email: payload,
+            };
+        case ReservationAction.UPDATE_PHONE:
+            return {
+                ...state,
+                phone: payload,
+            };
+        case ReservationAction.UPDATE_GUESTS:
+            return {
+                ...state,
+                totalGuests: payload,
+            };
+        case ReservationAction.UPDATE_DAY:
+            return {
+                ...state,
+                time: payload,
+            };
+        case ReservationAction.UPDATE_TIME:
+            return {
+                ...state,
+                time: payload,
+            };
+        default:
+            return state;
+    }
+}
+
 function EditReservation(props: EditReservationProps) {
-    const [reservation, setReservation] = useState(props.reservation);
+    const deSerializedReservation: ReservationDeSerialized = {
+        ...props.reservation,
+        time: dayjsNorway(props.reservation.time).toDate(),
+        timeOfReservation: dayjsNorway(
+            props.reservation.timeOfReservation
+        ).toDate(),
+    };
+
+    const [errorMessage, setErrorMessage] = useState<null |string>(null);
+
+    const [reservation, dispatch] = useReducer(
+        reducer,
+        deSerializedReservation
+    );
+
+    const handleSubmit = async (event: FormEvent) => {
+        event.preventDefault();
+
+        try {
+            const res = await fetch("/api/reservation", {
+                method: "put",
+                body: JSON.stringify(reservation),
+            });
+
+            if(!res.ok){
+                const errorObj = await res.json();
+                setErrorMessage(errorObj.message);
+                console.error(errorObj.error);
+            }
+        } catch (error) {
+            setErrorMessage("Some unexpected error occurred");
+        }
+    };
 
     return (
         <>
@@ -28,52 +130,79 @@ function EditReservation(props: EditReservationProps) {
             <ContainerLayout>
                 <HeaderTitle>Edit reservation</HeaderTitle>
                 <main>
-                    <FormInput
-                        type="text"
-                        value={reservation.email}
-                        onChange={(event) => {
-                            setReservation({
-                                ...reservation,
-                                email: event.target.value,
-                            });
-                        }}
-                    />
+                    <Panel>
+                        <form onSubmit={handleSubmit}>
+                            <DaySelector
+                                isEdit
+                                selected={reservation.time}
+                                setSelected={(day) => {
+                                    dispatch({
+                                        type: ReservationAction.UPDATE_DAY,
+                                        payload: day,
+                                    });
+                                }}
+                                radioChangeHandler={(event) => {
+                                    dispatch({
+                                        type: ReservationAction.UPDATE_TIME,
+                                        payload: dayjsNorway(
+                                            event.target.value
+                                        ).toDate(),
+                                    });
+                                }}
+                            />
 
-                    <FormInput
-                        type="text"
-                        value={reservation.name}
-                        onChange={(event) => {
-                            setReservation({
-                                ...reservation,
-                                name: event.target.value,
-                            });
-                        }}
-                    />
+                            <FormInput
+                                type="text"
+                                value={reservation.email}
+                                onChange={(event) => {
+                                    dispatch({
+                                        type: ReservationAction.UPDATE_EMAIL,
+                                        payload: event.target.value,
+                                    });
+                                }}
+                            />
 
-                    <FormInput
-                        type="number"
-                        value={reservation.phone}
-                        onChange={(event) => {
-                            setReservation({
-                                ...reservation,
-                                phone: parseInt(event.target.value),
-                            });
-                        }}
-                    />
+                            <FormInput
+                                type="text"
+                                value={reservation.name}
+                                onChange={(event) => {
+                                    dispatch({
+                                        type: ReservationAction.UPDATE_NAME,
+                                        payload: event.target.value,
+                                    });
+                                }}
+                            />
 
-                    <FormInput
-                        type="number"
-                        value={reservation.totalGuests}
-                        onChange={(event) => {
-                            setReservation({
-                                ...reservation,
-                                totalGuests: parseInt(event.target.value),
-                            });
-                        }}
-                    />
+                            <FormInput
+                                type="number"
+                                value={reservation.phone}
+                                onChange={(event) => {
+                                    dispatch({
+                                        type: ReservationAction.UPDATE_PHONE,
+                                        payload: parseInt(event.target.value),
+                                    });
+                                }}
+                            />
 
-                    <Button primary>Edit</Button>
-                    <Link href="/admin">Cancel</Link>
+                            <FormInput
+                                type="number"
+                                value={reservation.totalGuests}
+                                onChange={(event) => {
+                                    dispatch({
+                                        type: ReservationAction.UPDATE_GUESTS,
+                                        payload: parseInt(event.target.value),
+                                    });
+                                }}
+                            />
+
+                            {errorMessage ? (
+                                <NotificationBar message={errorMessage} />
+                            ) : null}
+
+                            <Button primary>Edit</Button>
+                            <Link href="/admin">Cancel</Link>
+                        </form>
+                    </Panel>
                 </main>
             </ContainerLayout>
         </>

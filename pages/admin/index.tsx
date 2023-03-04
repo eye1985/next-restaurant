@@ -314,10 +314,12 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         );
 
         if (!response.ok) {
+            const error = await response.json();
             return {
                 props: {
                     reservations: [],
                     message: "Could not retrieve reservations",
+                    error
                 },
             };
         }

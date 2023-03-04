@@ -1,12 +1,11 @@
 import {
     ClassNames,
     DayPicker,
-    SelectSingleEventHandler,
 } from "react-day-picker";
 import styles from "react-day-picker/dist/style.module.css";
 import dayjs from "dayjs";
 import classes from "./day-selector.module.css";
-import { ChangeEvent, useContext } from "react";
+import { ChangeEvent, RefObject, useContext, useEffect, useRef } from "react";
 import { ReservationContext } from "@/context/reservation-context-provider";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
@@ -19,13 +18,37 @@ dayjs.extend(timezone);
 interface DaySelectorProps {
     className?: string;
     selected: Date | undefined;
-    setSelected: SelectSingleEventHandler;
+    isEdit?: boolean;
+    setSelected: (day: Date) => void;
     radioChangeHandler: (event: ChangeEvent<HTMLInputElement>) => void;
 }
 
 function DaySelector(props: DaySelectorProps) {
-    const { selected, setSelected } = props;
+    const { selected, setSelected, isEdit } = props;
     const { timeError } = useContext(ReservationContext);
+    const radioContainer = useRef<HTMLDivElement>(null);
+
+    const selectedRadioElement = (
+        selectedDate: Date,
+        radioRef: RefObject<HTMLDivElement>
+    ): HTMLInputElement | null => {
+        if (!radioRef || !radioRef.current) {
+            return null;
+        }
+
+        const timeISO = dayjsNorway(selectedDate).toISOString();
+        return radioRef.current.querySelector(
+            `input[type='radio'][value='${timeISO}']`
+        ) as HTMLInputElement;
+    };
+
+    useEffect(() => {
+        if (isEdit && radioContainer.current && selected) {
+            const radioElement = selectedRadioElement(selected, radioContainer);
+            radioElement?.setAttribute("checked", "checked");
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const listOfReservations = (
         hour: number,
@@ -73,7 +96,7 @@ function DaySelector(props: DaySelectorProps) {
         selectedDate: Date,
         days: number,
         check: (date: Date) => boolean
-    ):Date => {
+    ): Date => {
         if (check(selectedDate)) {
             const addedDayDate = new Date(selectedDate);
             addedDayDate.setDate(addedDayDate.getDate() + days);
@@ -84,7 +107,7 @@ function DaySelector(props: DaySelectorProps) {
     };
 
     let selectedDate = selected;
-    if(selected){
+    if (selected) {
         selectedDate = recursiveFirstAvailableDate(selected, 1, isSundayMonday);
     }
 
@@ -98,13 +121,41 @@ function DaySelector(props: DaySelectorProps) {
                         required
                         disabled={disabledDays}
                         selected={selectedDate}
-                        onSelect={setSelected}
+                        onSelect={(day) => {
+                            let pickedDate = new Date();
+                            if (day) {
+                                pickedDate = day;
+                            }
+                            if (selectedDate) {
+                                const radioElement = selectedRadioElement(
+                                    selectedDate,
+                                    radioContainer
+                                );
+
+                                if (radioElement) {
+                                    const radioDate = dayjsNorway(
+                                        radioElement.value
+                                    );
+
+                                    pickedDate = dayjsNorway(pickedDate)
+                                        .set("hour", radioDate.hour())
+                                        .set("minute", radioDate.minute())
+                                        .set("second", 0)
+                                        .toDate();
+                                }
+                            }
+
+                            setSelected(pickedDate);
+                        }}
                     />
                 </div>
 
                 {selected ? (
                     <div>
-                        <div className={classes.radioContainer}>
+                        <div
+                            className={classes.radioContainer}
+                            ref={radioContainer}
+                        >
                             {listOfReservations(15, 45, 13, selected).map(
                                 (dateObj, index: number) => (
                                     <div

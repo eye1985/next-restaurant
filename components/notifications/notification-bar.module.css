@@ -1,5 +1,6 @@
-.notificationBar{
-    padding:10px 20px;
-    background:hsla(0, 100%, 100%, 1);
-    border: 2px solid hsla(0, 0%, 13%, 1);;
+.notificationBar {
+    padding: 10px 20px;
+    background: hsla(0, 100%, 100%, 1);
+    border: 3px solid hsla(0, 100%, 50%, 1);
+    font-style:italic;
 }

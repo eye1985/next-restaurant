@@ -2,7 +2,6 @@ import DaySelector from "@/components/reservation/day-selector";
 import { ChangeEvent, FormEvent, useContext, useState } from "react";
 import classes from "./reservation-form.module.css";
 import NumberSelector from "@/components/reservation/number-selector";
-import { SelectSingleEventHandler } from "react-day-picker";
 import Modal from "react-modal";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
@@ -166,7 +165,7 @@ function ReservationForm(props: ReservationFormProps) {
                         <DaySelector
                             selected={selectedDay}
                             setSelected={
-                                setSelectedDay as SelectSingleEventHandler
+                                setSelectedDay
                             }
                             radioChangeHandler={radioChangeHandler}
                         />

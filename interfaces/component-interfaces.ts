@@ -1,5 +1,5 @@
 import {ReactNode} from "react";
 
-export interface ElementWithChildren{
+export interface WithChildren {
     children : ReactNode | ReactNode[]
 }
