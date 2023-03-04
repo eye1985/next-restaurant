@@ -4,9 +4,17 @@
     --font-color: hsl(0, 0%, 12%, 1);
     --box-shadow-color: hsla(0, 0%, 82%, 1);
 
+    /* Primary color */
+    --primary-color-h: 180deg;
+    --primary-color-s: 100%;
+    --primary-color-l: 13%;
+    --primary-color: hsla(var(--primary-color-h), var(--primary-color-s), var(--primary-color-l), 1);
+    --primary-color-light: hsla(var(--primary-color-h), var(--primary-color-s), calc(var(--primary-color-l) + 15%), 1);
+    --primary-color-dark: hsla(var(--primary-color-h), var(--primary-color-s), calc(var(--primary-color-l) - 15%), 1);
+
     --reservation-form-bg: hsla(0, 100%, 100%, 1);
 
-    --reservation-item-border-color:hsla(0, 0%, 72%,1);
+    --reservation-item-border-color: hsla(0, 0%, 72%, 1);
 
     --footer-bg: hsla(0, 16%, 13%, 1);
     --footer-border-top: hsla(0, 100%, 13%, 1);
@@ -27,13 +35,13 @@
     --button-active-bg: hsl(0, 0%, 12%, 1);
     --button-active-color: hsla(0, 100%, 100%, 1);
 
-    --button-primary-bg: hsla(180, 100%, 13%, 1);
+    --button-primary-bg: var(--primary-color);
     --button-primary-color: hsla(0, 100%, 100%, 1);
-    --button-primary-hover-bg: hsla(180, 100%, 23%, 1);
-    --button-primary-hover-border-color: hsla(180, 100%, 23%, 1);
+    --button-primary-hover-bg: var(--primary-color-light);
+    --button-primary-hover-border-color: var(--primary-color-light);
     --button-primary-hover-color: hsla(0, 100%, 100%, 1);
-    --button-primary-active-bg: hsla(180, 100%, 8%, 1);
-    --button-primary-active-border-color: hsla(180, 100%, 8%, 1);
+    --button-primary-active-bg: var(--primary-color-dark);
+    --button-primary-active-border-color: var(--primary-color-dark);
 
     --button-danger-bg: hsla(0, 100%, 40%, 1);
     --button-danger-color: hsla(0, 100%, 100%, 1);

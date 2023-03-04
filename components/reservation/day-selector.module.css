@@ -26,6 +26,11 @@
     align-items: center;
 }
 
+.radioItem:hover{
+    background: var(--primary-color);
+    color: hsla(0, 100%, 100%, 1);
+}
+
 .radioItem > input[type='radio']{
     margin: 0 10px 0 10px;
 }
@@ -35,9 +40,13 @@
     padding:10px 10px 10px 0;
 }
 
+.radioItem > label:hover{
+    cursor: pointer;
+}
+
 .customRoot{
     --rdp-cell-size: 40px;
-    --rdp-accent-color: hsla(180deg, 100%, 13%,1);
+    --rdp-accent-color: var(--primary-color);
     --rdp-background-color: hsl(180, 79%, 92%);
     --rdp-accent-color-dark: #3003e1;
     --rdp-background-color-dark: #180270;

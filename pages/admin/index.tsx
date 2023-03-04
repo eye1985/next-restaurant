@@ -2,7 +2,7 @@ import Head from "next/head";
 import ContainerLayout from "@/layout/containerLayout";
 import HeaderTitle from "@/components/header-title";
 import { GetServerSidePropsContext } from "next";
-import { ChangeEvent, FormEvent, MouseEvent, useRef, useState } from "react";
+import { ChangeEvent, MouseEvent, useState } from "react";
 import Modal from "react-modal";
 import ReservationItem from "@/components/admin/reservation-item";
 import AdminLayout from "@/layout/admin-layout";
@@ -16,64 +16,36 @@ import ReservationItemForm from "@/components/admin/reservation-item-form";
 import Button from "@/components/form/button";
 import reactModalClasses from "@/styles/react-modal.module.css";
 import NotificationBar from "@/components/notifications/notification-bar";
+import {ReservationSerialized} from "@/interfaces/reservation";
+import {connectToDB, getAggregatedReservation} from "@/lib/db";
+import ToggleButtonContainer from "@/components/form/toggle-button-container";
 
-interface Reservation {
-    _id: string;
-    name: string;
-    phone: number;
-    email: string;
-    time: string;
-    timeOfReservation: string;
-    totalGuests: number;
-}
 
 interface ReservationObj {
     count: number;
     date: string;
-    reservation: Reservation[];
-}
-
-export interface ReservationEditable extends Reservation {
-    isEdit: boolean;
-}
-
-interface ReservationObjClient {
-    count: number;
-    date: string;
-    reservation: ReservationEditable[];
+    reservation: ReservationSerialized[];
 }
 
 interface AdminProps {
-    reservations: ReservationObj[];
+    reservations: string;
     message?: string;
     error?: unknown;
 }
 
 function AdminPage(props: AdminProps) {
     const [modalIsOpen, setIsOpen] = useState(false);
+    const [useLoader, setUseLoader] = useState(false);
 
-    const modifiedReservations: ReservationObjClient[] = props.reservations.map(
-        (reservation) => {
-            return {
-                count: reservation.count,
-                date: reservation.date,
-                reservation: reservation.reservation.map((res) => ({
-                    ...res,
-                    isEdit: false,
-                })),
-            };
-        }
-    );
+    const reservations:ReservationObj[] = JSON.parse(props.reservations);
 
+    //TODO refactor to reducer
     const [reservationState, setReservationState] =
-        useState(modifiedReservations);
+        useState(reservations);
 
     const [currentReservationIndex, setCurrentReservationIndex] = useState(0);
-
     const [currentToDeleteReservationId, setCurrentToDeleteReservationId] =
         useState("");
-
-    const reservationSelectRef = useRef<HTMLSelectElement>(null);
 
     function openModal() {
         setIsOpen(true);
@@ -83,15 +55,6 @@ function AdminPage(props: AdminProps) {
         setIsOpen(false);
     }
 
-    const toggleEditInReservations = (id: string, isEdit: boolean) => {
-        // return reservations.map((reservation) => {
-        //     if (reservation._id === id) {
-        //         reservation.isEdit = isEdit;
-        //     }
-        //     return reservation;
-        // });
-    };
-
     const deleteModalHandler = (event: MouseEvent) => {
         const id = (event.target as HTMLButtonElement).getAttribute("data-id");
         if (id) {
@@ -100,24 +63,9 @@ function AdminPage(props: AdminProps) {
         openModal();
     };
 
-    const toggleEditHandler = (event: MouseEvent) => {
-        event.preventDefault();
-        const id = (event.target as HTMLButtonElement).getAttribute("data-id");
-        let isEdit = false;
-        const isEnabled = (event.target as HTMLButtonElement).getAttribute(
-            "data-enable"
-        );
-        if (isEnabled === "true") {
-            isEdit = true;
-        }
-        if (id) {
-            const editReservation = toggleEditInReservations(id, isEdit);
-            // setReservations(editReservation);
-        }
-    };
-
     const deleteHandler = async () => {
         if (currentToDeleteReservationId) {
+            setUseLoader(true);
             try {
                 const clonedReservationState = cloneDeep(reservationState);
                 clonedReservationState[currentReservationIndex].count -= 1;
@@ -143,34 +91,11 @@ function AdminPage(props: AdminProps) {
             } catch (error) {
                 console.log(error);
             }
+
+            setUseLoader(false);
         }
 
         closeModal();
-    };
-
-    const submitHandler = (event: FormEvent) => {
-        event.preventDefault();
-        const id = (event.target as HTMLFormElement).getAttribute("data-id");
-
-        if (reservationSelectRef.current) {
-            fetch("/api/reservation", {
-                method: "put",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    id,
-                    totalGuests: reservationSelectRef.current.value,
-                }),
-            })
-                .then((res) => res.json())
-                .then((data) => console.log(data));
-        }
-
-        if (id) {
-            const editReservation = toggleEditInReservations(id, false);
-            // setReservations(editReservation);
-        }
     };
 
     Modal.setAppElement("#__next");
@@ -201,7 +126,7 @@ function AdminPage(props: AdminProps) {
         }
     };
 
-    const renderReservationJSX = (reservations: ReservationObjClient[]) => {
+    const renderReservationJSX = (reservations: ReservationObj[]) => {
         return reservations.map((reservationObj, index) => {
             return (
                 <ToggleButton
@@ -235,8 +160,8 @@ function AdminPage(props: AdminProps) {
                 <HeaderTitle>Admin</HeaderTitle>
                 <main>
                     <AdminDescription>
-                        All reservation prior to today&apos;s date are automatically
-                        deleted. <strong>(Not yet implemented)</strong>
+                        All reservation prior to today&apos;s date are
+                        automatically deleted.
                     </AdminDescription>
 
                     {reservationState.length === 0 ? (
@@ -249,7 +174,9 @@ function AdminPage(props: AdminProps) {
                                         Reservation dates
                                     </AdminSectionHeader>
                                 </div>
-                                {renderReservationJSX(reservationState)}
+                                <ToggleButtonContainer>
+                                    {renderReservationJSX(reservationState)}
+                                </ToggleButtonContainer>
                             </div>
 
                             <div>
@@ -259,19 +186,13 @@ function AdminPage(props: AdminProps) {
                                 {reservationState.length > 0 &&
                                     reservationState[
                                         currentReservationIndex
-                                    ].reservation.map((reservation) => {
+                                    ].reservation.map((reservation,  index) => {
                                         return (
                                             <ReservationItem
-                                                key={reservation.time}
+                                                key={`${reservation.time}_${index}`}
                                             >
                                                 <ReservationItemForm
                                                     reservation={reservation}
-                                                    submitHandler={
-                                                        submitHandler
-                                                    }
-                                                    toggleEditHandler={
-                                                        toggleEditHandler
-                                                    }
                                                     deleteModalHandler={
                                                         deleteModalHandler
                                                     }
@@ -301,7 +222,7 @@ function AdminPage(props: AdminProps) {
                                         reactModalClasses.buttonContainer
                                     }
                                 >
-                                    <Button onClick={deleteHandler} danger full>
+                                    <Button loader={useLoader} onClick={deleteHandler} danger full>
                                         Delete
                                     </Button>
                                     <Button onClick={closeModal} full>
@@ -320,10 +241,6 @@ function AdminPage(props: AdminProps) {
 export default AdminPage;
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-    const uri = process.env.VERCEL_URL
-        ? `https://${process.env.VERCEL_URL}`
-        : process.env.BASE_ORIGIN;
-    let reservations: Reservation[] = [];
     const session = await getServerSession(
         context.req,
         context.res,
@@ -339,38 +256,31 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         };
     }
 
-    try {
-        const response = await fetch(
-            `${uri}/api/reservation?prepareInitialReservation=true`,
-            {
-                method: "get",
-            }
-        );
-
-        if (!response.ok) {
-            return {
-                props: {
-                    reservations: [],
-                    message: "Could not retrieve reservations",
-                },
-            };
-        }
-
-        const json = await response.json();
-        reservations = json.reservations;
-    } catch (error) {
+    const [client, dbError] = await connectToDB();
+    if(dbError){
         return {
             props: {
                 reservations: [],
-                message: "Could not retrieve reservations",
-                error,
+                message: "Cannot connect to db",
+                error : dbError
+            },
+        };
+    }
+
+    const [reservations, resError] = await getAggregatedReservation(client);
+    if(resError){
+        return {
+            props: {
+                reservations: [],
+                message: "Failed to fetch from collection",
+                error : resError
             },
         };
     }
 
     return {
         props: {
-            reservations,
+            reservations:JSON.stringify(reservations)
         },
     };
 }

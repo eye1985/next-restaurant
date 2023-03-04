@@ -1,14 +1,27 @@
-import { ButtonHTMLAttributes } from "react";
+import { ButtonHTMLAttributes, ReactElement } from "react";
 import classes from "./button.module.css";
+import { ColorRing } from "react-loader-spinner";
+import CenterAlign from "@/layout/center-align";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     full?: boolean;
-    primary?:boolean;
-    danger?:boolean;
+    primary?: boolean;
+    danger?: boolean;
+    renderComponent?: (btnClass: string) => ReactElement;
+    loader?: boolean;
 }
 
 function Button(props: ButtonProps) {
-    const { className, children, full,primary,danger, ...restProps } = props;
+    const {
+        className,
+        children,
+        full,
+        primary,
+        danger,
+        loader,
+        renderComponent,
+        ...restProps
+    } = props;
     let buttonClass = "";
     if (className) {
         buttonClass = className;
@@ -18,17 +31,32 @@ function Button(props: ButtonProps) {
         buttonClass += ` ${classes.full}`;
     }
 
-    if(primary){
+    if (primary) {
         buttonClass += ` ${classes.primary}`;
     }
 
-    if(danger){
+    if (danger) {
         buttonClass += ` ${classes.danger}`;
     }
 
-    return (
+    return renderComponent ? (
+        renderComponent(classes.button)
+    ) : (
         <button className={`${classes.button} ${buttonClass}`} {...restProps}>
-            {children}
+            <CenterAlign>
+                {loader ? (
+                    <ColorRing
+                        visible={loader}
+                        height="18"
+                        width="18"
+                        ariaLabel="blocks-loading"
+                        wrapperClass="blocks-wrapper"
+                        colors={["#fff", "#fff", "#fff", "#fff", "#fff"]}
+                    />
+                ) : (
+                    children
+                )}
+            </CenterAlign>
         </button>
     );
 }

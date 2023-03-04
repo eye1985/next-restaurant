@@ -1,27 +1,25 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { connectToDB } from "@/lib/db";
+import { connectToDB, getAggregatedReservation } from "@/lib/db";
 import { FetchMethods } from "@/enum/fetch-methods";
 import { ObjectId } from "mongodb";
-import {z} from "zod";
+import { z } from "zod";
+import { ReservationDeSerialized } from "@/interfaces/reservation";
+import { dayjsNorway } from "@/utils/date";
 
-export interface ReservationBody {
-    name: string;
-    email: string;
-    phone: number;
-    time: Date;
-    timeOfReservation: Date;
-    totalGuests: number;
-    _id?: string;
-}
-
-interface PutReservationBody {
-    totalGuests: number;
-    id: string;
-}
+const createReservationValidation = () => {
+    return z.object({
+        name: z.string().min(2).regex(/^[^0-9]*$/),
+        time: z.string().datetime(),
+        email: z.string().email(),
+        phone: z.number().min(8),
+        totalGuests: z.number().min(1).max(8),
+        timeOfReservation: z.string().datetime(),
+    });
+};
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
-    const client = await connectToDB();
-    if (!client) {
+    const [client, errorObj] = await connectToDB();
+    if (errorObj) {
         res.status(500).json({
             message: `Cannot connect to DB`,
         });
@@ -54,46 +52,16 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
                         })
                         .toArray();
                 } else if (prepareInitialReservation) {
-                    reservations = await collection
-                        .aggregate([
-                            {
-                                $group: {
-                                    _id: {
-                                        $dateToString: {
-                                            format: "%Y-%m-%d",
-                                            date: "$time",
-                                        },
-                                    },
-                                    count: { $sum: 1 },
-                                    reservation: {
-                                        $push: {
-                                            _id: "$_id",
-                                            name: "$name",
-                                            time: "$time",
-                                            email: "$email",
-                                            phone: "$phone",
-                                            totalGuests: "$totalGuests",
-                                            timeOfReservation:
-                                                "$timeOfReservation",
-                                        },
-                                    },
-                                },
-                            },
-                            {
-                                $project: {
-                                    date: "$_id",
-                                    count: 1,
-                                    _id: 0,
-                                    reservation: 1,
-                                },
-                            },
-                            {
-                                $sort: {
-                                    date: 1,
-                                },
-                            },
-                        ])
-                        .toArray();
+                    const [result, error] = await getAggregatedReservation(
+                        client
+                    );
+                    if (error) {
+                        res.status(500).json({
+                            message: "Failed to retrieve collection",
+                            error,
+                        });
+                    }
+                    reservations = result;
                 } else {
                     reservations = await collection.find({}).toArray();
                 }
@@ -116,7 +84,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         case FetchMethods.POST: {
             try {
                 const collection = client.db("Bao").collection("reservations");
-                const reqBody: ReservationBody = req.body;
+                const reqBody: ReservationDeSerialized = req.body;
                 const {
                     name,
                     time,
@@ -126,15 +94,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
                     timeOfReservation,
                 } = reqBody;
 
-                const reservationValidation = z.object({
-                    name : z.string().min(2),
-                    time: z.string().datetime(),
-                    email: z.string().email(),
-                    phone:z.number().min(8),
-                    totalGuests:z.number().min(1).max(8),
-                    timeOfReservation:z.string().datetime()
-                });
-
+                const reservationValidation = createReservationValidation();
                 reservationValidation.parse(reqBody);
 
                 const insert = await collection.insertOne({
@@ -155,7 +115,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
                 await client.close();
                 res.status(500).json({
                     message: `Failed to create record`,
-                    error
+                    error,
                 });
             }
             break;
@@ -163,24 +123,33 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         case FetchMethods.PUT: {
             try {
                 const collection = client.db("Bao").collection("reservations");
-                const reqBody: PutReservationBody = req.body;
+                const reqBody: ReservationDeSerialized = JSON.parse(req.body);
+
+                const reservationValidation = createReservationValidation();
+                reservationValidation.parse(reqBody);
 
                 await collection.updateOne(
-                    { _id: new ObjectId(reqBody.id) },
+                    { _id: new ObjectId(reqBody._id) },
                     {
                         $set: {
+                            name: reqBody.name,
+                            email: reqBody.email,
+                            phone: reqBody.phone,
+                            time: dayjsNorway(reqBody.time).toDate(),
+                            timeOfReservation: dayjsNorway(new Date()).toDate(),
                             totalGuests: reqBody.totalGuests,
                         },
                     }
                 );
 
                 res.status(200).json({
-                    message: `${reqBody.id} updated`,
+                    message: `${reqBody._id} updated`,
                 });
             } catch (error) {
                 await client.close();
                 res.status(500).json({
-                    message: `Failed to update record`,
+                    message: `Make sure the field constraint are correct`,
+                    error,
                 });
             }
             break;

@@ -4,7 +4,6 @@ import ContainerLayout from "@/layout/containerLayout";
 import HeaderTitle from "@/components/header-title";
 import ReservationForm from "@/components/reservation/reservation-form";
 import {useContext} from "react";
-import {ReservationBody} from "@/pages/api/reservation";
 import {ReservationContext} from "@/context/reservation-context-provider";
 import {ZodError} from "zod";
 
@@ -14,7 +13,7 @@ function Reservation() {
 
     const submitReservationHandler = async () => {
         try {
-            const reservationBody: ReservationBody = {
+            const reservationBody = {
                 email,
                 phone: phone ? phone : 0,
                 name: fullName,

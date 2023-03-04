@@ -14,10 +14,9 @@ import errorClasses from "../styles/utils/error.module.css";
 import FormLabel from "@/components/form/form-elements/form-label";
 import FormRow from "@/components/form/form-elements/form-row";
 import FormInput from "@/components/form/form-elements/form-input";
-import { ColorRing } from "react-loader-spinner";
-import {GetServerSidePropsContext} from "next";
-import {getServerSession} from "next-auth/next";
-import {authOptions} from "@/pages/api/auth/[...nextauth]";
+import { GetServerSidePropsContext } from "next";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/pages/api/auth/[...nextauth]";
 
 function Login() {
     const usernameRef = useRef<HTMLInputElement>(null);
@@ -98,27 +97,12 @@ function Login() {
 
                                     <Button
                                         className={spacingClasses.mt20}
+                                        loader={useLoader}
                                         full
                                         primary
                                         disabled={useLoader}
                                     >
-                                        <CenterAlign>
-                                            {useLoader ? null:"Login"}
-                                            <ColorRing
-                                                visible={useLoader}
-                                                height="18"
-                                                width="18"
-                                                ariaLabel="blocks-loading"
-                                                wrapperClass="blocks-wrapper"
-                                                colors={[
-                                                    "#fff",
-                                                    "#fff",
-                                                    "#fff",
-                                                    "#fff",
-                                                    "#fff",
-                                                ]}
-                                            />
-                                        </CenterAlign>
+                                        Login
                                     </Button>
                                 </FormElements>
                             </form>
@@ -130,25 +114,25 @@ function Login() {
     );
 }
 
-export async function getServerSideProps(context:GetServerSidePropsContext){
+export async function getServerSideProps(context: GetServerSidePropsContext) {
     const session = await getServerSession(
         context.req,
         context.res,
         authOptions
     );
 
-    if(session){
+    if (session) {
         return {
             redirect: {
                 destination: "/admin",
                 permanent: false,
             },
-        }
+        };
     }
 
     return {
-        props:{}
-    }
+        props: {},
+    };
 }
 
 export default Login;

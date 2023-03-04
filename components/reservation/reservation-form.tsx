@@ -2,7 +2,6 @@ import DaySelector from "@/components/reservation/day-selector";
 import { ChangeEvent, FormEvent, useContext, useState } from "react";
 import classes from "./reservation-form.module.css";
 import NumberSelector from "@/components/reservation/number-selector";
-import { SelectSingleEventHandler } from "react-day-picker";
 import Modal from "react-modal";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
@@ -16,10 +15,10 @@ import FormRow from "@/components/form/form-elements/form-row";
 import FormElements from "@/components/form/form-elements/form-elements";
 import { ZodError } from "zod";
 import FormErrorLabel from "@/components/form/form-elements/form-error-label";
-import { ColorRing } from "react-loader-spinner";
 import CenterAlign from "@/layout/center-align";
 import spacingClasses from "@/styles/utils/spacing.module.css";
 import { formatDate } from "@/utils/date";
+import Panel from "@/components/panel";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -153,20 +152,14 @@ function ReservationForm(props: ReservationFormProps) {
     return (
         <>
             {displayForm ? (
-                <>
+                <Panel>
                     <form
-                        className={classes.reservationForm}
                         onSubmit={submitFormHandler}
                     >
-                        <NumberSelector
-                            onChange={selectGuestHandler}
-                            guests={totalGuests}
-                        />
-
                         <DaySelector
                             selected={selectedDay}
                             setSelected={
-                                setSelectedDay as SelectSingleEventHandler
+                                setSelectedDay
                             }
                             radioChangeHandler={radioChangeHandler}
                         />
@@ -220,6 +213,11 @@ function ReservationForm(props: ReservationFormProps) {
                                     <FormErrorLabel message={phoneError} />
                                 ) : null}
                             </FormRow>
+
+                            <NumberSelector
+                                onChange={selectGuestHandler}
+                                guests={totalGuests}
+                            />
                         </FormElements>
 
                         <div className={classes.submitContainer}>
@@ -256,25 +254,8 @@ function ReservationForm(props: ReservationFormProps) {
                             </p>
 
                             <div className={reactModalClasses.buttonContainer}>
-                                <Button onClick={submitHandler} primary full>
-                                    <CenterAlign>
-                                        {confirmLoader ? null : "Confirm"}
-
-                                        <ColorRing
-                                            visible={confirmLoader}
-                                            height="18"
-                                            width="18"
-                                            ariaLabel="blocks-loading"
-                                            wrapperClass="blocks-wrapper"
-                                            colors={[
-                                                "#fff",
-                                                "#fff",
-                                                "#fff",
-                                                "#fff",
-                                                "#fff",
-                                            ]}
-                                        />
-                                    </CenterAlign>
+                                <Button onClick={submitHandler} loader={confirmLoader} primary full>
+                                    Confirm
                                 </Button>
                                 <Button onClick={closeModal} full>
                                     Cancel
@@ -282,7 +263,7 @@ function ReservationForm(props: ReservationFormProps) {
                             </div>
                         </div>
                     </Modal>
-                </>
+                </Panel>
             ) : (
                 <div className={classes.receipt}>
                     <h1>Thank you for your reservation</h1>
