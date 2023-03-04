@@ -1,13 +1,9 @@
 import Image from "next/image";
 import classes from "./hero.module.css";
+import Logo from "@/components/logo";
 
-interface HeroProps {
-    title: string;
-    char: string;
-}
 
-function Hero(props: HeroProps) {
-    const { title, char } = props;
+function Hero() {
     return (
         <header className={classes.header}>
             <Image
@@ -20,10 +16,7 @@ function Hero(props: HeroProps) {
                 }}
             />
 
-            <h1 className={classes.h1}>
-                {title}
-                <span className={classes.char}>{char}</span>
-            </h1>
+            <Logo tag="h1" />
         </header>
     );
 }

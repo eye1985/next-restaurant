@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import ContainerLayout from "@/layout/containerLayout";
 import { signOut, useSession } from "next-auth/react";
+import Logo from "@/components/logo";
 
 function TopBar() {
     const router = useRouter();
@@ -77,7 +78,7 @@ function TopBar() {
 
                     <li className={classes.home}>
                         <Link href="/" title="home">
-                            Bao 包
+                            <Logo tag="div" autoFontSize transparent />
                         </Link>
                     </li>
                 </ul>

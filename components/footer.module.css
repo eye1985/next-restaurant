@@ -1,30 +1,44 @@
-.footer{
-    background:var(--footer-bg);
-    color:#fff;
+.footer {
+    background: var(--footer-bg);
+    color: #fff;
     padding: 80px 20px;
-    border-top:4px solid var(--footer-border-top);
+    border-top: 4px solid var(--footer-border-top);
     line-height: 1.8;
     font-size: 1.4rem;
-    font-weight:300;
-    height:auto;
+    font-weight: 300;
+    height: auto;
 }
 
-.footer h2{
-    font-size:1.6rem;
-    font-weight:500;
+.footer h2 {
+    font-size: 1.6rem;
+    font-weight: 500;
 }
 
-.openingHours{
-    margin-bottom:40px;
+.openingHours {
+    margin-bottom: 40px;
 }
 
-.flex{
-    display: flex;
-    flex-direction:column;
+.footerLayout {
+    display: grid;
+    grid-template-columns: 1fr;
 }
 
-@media (min-width:720px){
-    .footer{
+.footerLogoContainer{
+    display: none;
+}
+
+@media (min-width: 720px) {
+    .footer {
         padding: 80px 40px;
+    }
+
+    .footerLayout {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .footerLogoContainer{
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
     }
 }

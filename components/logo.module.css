@@ -1,0 +1,38 @@
+.logo{
+    font-size: 81px;
+    font-weight: 300;
+    background: hsla(0, 0%, 100%, 0.6);
+    z-index: 1;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logoChar{
+    display: inline-block;
+    margin-left: 10px;
+    color: var(--heroCharColor);
+    text-shadow: 0 3px 3px var(--herCharShadowColor);
+}
+
+.transparent{
+    background:none;
+}
+
+.autoFontSize{
+    font-weight:normal;
+    font-size: inherit;
+    padding: 0;
+}
+
+.autoFontSize > p{
+    display: flex;
+    align-items: center;
+}
+
+.autoFontSize .logoChar{
+    margin-left:6px;
+    text-shadow: 0 1px 1px var(--herCharShadowColor);
+}
+
