@@ -6,6 +6,7 @@ import ReservationForm from "@/components/reservation/reservation-form";
 import {useContext} from "react";
 import {ReservationContext} from "@/context/reservation-context-provider";
 import {ZodError} from "zod";
+import {dayjsNorway} from "@/utils/date";
 
 function Reservation() {
     const {selectedTime, phone, fullName, email, totalGuests} =
@@ -18,8 +19,8 @@ function Reservation() {
                 phone: phone ? phone : 0,
                 name: fullName,
                 totalGuests,
-                time: new Date(selectedTime),
-                timeOfReservation: new Date(),
+                time: dayjsNorway(selectedTime).toDate(),
+                timeOfReservation: dayjsNorway(new Date()).toDate(),
             };
 
             const response = await fetch("/api/reservation", {

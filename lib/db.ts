@@ -95,7 +95,7 @@ export const getAggregatedReservation = async (client: MongoClient) => {
                 },
                 {
                     $sort: {
-                        date: 1,
+                        _id: 1,
                     },
                 },
             ])

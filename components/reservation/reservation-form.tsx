@@ -17,7 +17,7 @@ import { ZodError } from "zod";
 import FormErrorLabel from "@/components/form/form-elements/form-error-label";
 import CenterAlign from "@/layout/center-align";
 import spacingClasses from "@/styles/utils/spacing.module.css";
-import { formatDate } from "@/utils/date";
+import {dayjsNorway, formatDate} from "@/utils/date";
 import Panel from "@/components/panel";
 
 dayjs.extend(utc);
@@ -145,7 +145,7 @@ function ReservationForm(props: ReservationFormProps) {
         setFullName("");
         setPhoneNumber(null);
         setEmail("");
-        setSelectedDay(new Date());
+        setSelectedDay(dayjsNorway(new Date()).toDate());
         closeModal();
     };
 

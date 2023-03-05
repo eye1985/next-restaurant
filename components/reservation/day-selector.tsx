@@ -90,7 +90,7 @@ function DaySelector(props: DaySelectorProps) {
         return day === 0 || day === 1;
     };
 
-    const disabledDays = [isSundayMonday, { before: new Date() }];
+    const disabledDays = [isSundayMonday, { before: dayjsNorway(new Date()).toDate() }];
 
     const recursiveFirstAvailableDate = (
         selectedDate: Date,
@@ -98,7 +98,7 @@ function DaySelector(props: DaySelectorProps) {
         check: (date: Date) => boolean
     ): Date => {
         if (check(selectedDate)) {
-            const addedDayDate = new Date(selectedDate);
+            const addedDayDate = dayjsNorway(selectedDate).toDate();
             addedDayDate.setDate(addedDayDate.getDate() + days);
             return recursiveFirstAvailableDate(addedDayDate, 1, check);
         }
@@ -117,12 +117,13 @@ function DaySelector(props: DaySelectorProps) {
                 <div className={classes.calendar}>
                     <DayPicker
                         classNames={classNames}
+                        defaultMonth={selectedDate}
                         mode="single"
                         required
                         disabled={disabledDays}
                         selected={selectedDate}
                         onSelect={(day) => {
-                            let pickedDate = new Date();
+                            let pickedDate = dayjsNorway(new Date()).toDate();
                             if (day) {
                                 pickedDate = day;
                             }

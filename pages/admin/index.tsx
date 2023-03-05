@@ -16,10 +16,9 @@ import ReservationItemForm from "@/components/admin/reservation-item-form";
 import Button from "@/components/form/button";
 import reactModalClasses from "@/styles/react-modal.module.css";
 import NotificationBar from "@/components/notifications/notification-bar";
-import {ReservationSerialized} from "@/interfaces/reservation";
-import {connectToDB, getAggregatedReservation} from "@/lib/db";
+import { ReservationSerialized } from "@/interfaces/reservation";
+import { connectToDB, getAggregatedReservation } from "@/lib/db";
 import ToggleButtonContainer from "@/components/form/toggle-button-container";
-
 
 interface ReservationObj {
     count: number;
@@ -37,11 +36,10 @@ function AdminPage(props: AdminProps) {
     const [modalIsOpen, setIsOpen] = useState(false);
     const [useLoader, setUseLoader] = useState(false);
 
-    const reservations:ReservationObj[] = JSON.parse(props.reservations);
+    const reservations: ReservationObj[] = JSON.parse(props.reservations);
 
     //TODO refactor to reducer
-    const [reservationState, setReservationState] =
-        useState(reservations);
+    const [reservationState, setReservationState] = useState(reservations);
 
     const [currentReservationIndex, setCurrentReservationIndex] = useState(0);
     const [currentToDeleteReservationId, setCurrentToDeleteReservationId] =
@@ -186,7 +184,7 @@ function AdminPage(props: AdminProps) {
                                 {reservationState.length > 0 &&
                                     reservationState[
                                         currentReservationIndex
-                                    ].reservation.map((reservation,  index) => {
+                                    ].reservation.map((reservation, index) => {
                                         return (
                                             <ReservationItem
                                                 key={`${reservation.time}_${index}`}
@@ -222,7 +220,12 @@ function AdminPage(props: AdminProps) {
                                         reactModalClasses.buttonContainer
                                     }
                                 >
-                                    <Button loader={useLoader} onClick={deleteHandler} danger full>
+                                    <Button
+                                        loader={useLoader}
+                                        onClick={deleteHandler}
+                                        danger
+                                        full
+                                    >
                                         Delete
                                     </Button>
                                     <Button onClick={closeModal} full>
@@ -257,30 +260,30 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     }
 
     const [client, dbError] = await connectToDB();
-    if(dbError){
+    if (dbError) {
         return {
             props: {
-                reservations: [],
+                reservations: "[]",
                 message: "Cannot connect to db",
-                error : dbError
+                error: JSON.stringify(dbError),
             },
         };
     }
 
     const [reservations, resError] = await getAggregatedReservation(client);
-    if(resError){
+    if (resError) {
         return {
             props: {
-                reservations: [],
+                reservations: "[]",
                 message: "Failed to fetch from collection",
-                error : resError
+                error: JSON.stringify(resError),
             },
         };
     }
 
     return {
         props: {
-            reservations:JSON.stringify(reservations)
+            reservations: JSON.stringify(reservations),
         },
     };
 }
