@@ -19,6 +19,7 @@ import NotificationBar from "@/components/notifications/notification-bar";
 import { ReservationSerialized } from "@/interfaces/reservation";
 import { connectToDB, getAggregatedReservation } from "@/lib/db";
 import ToggleButtonContainer from "@/components/form/toggle-button-container";
+import { dayjsNorway } from "@/utils/date";
 
 interface ReservationObj {
     count: number;
@@ -29,7 +30,7 @@ interface ReservationObj {
 interface AdminProps {
     reservations: string;
     message?: string;
-    error?: unknown;
+    error?: string;
 }
 
 function AdminPage(props: AdminProps) {
@@ -37,6 +38,27 @@ function AdminPage(props: AdminProps) {
     const [useLoader, setUseLoader] = useState(false);
 
     const reservations: ReservationObj[] = JSON.parse(props.reservations);
+
+    reservations.sort((a, b) => {
+        const [aDay, aMonth, aYear] = a.date.split(".");
+        const [bDay, bMonth, bYear] = b.date.split(".");
+
+        const aDate = dayjsNorway(new Date())
+            .set("day", parseInt(aDay))
+            .set("month", parseInt(aMonth)-1)
+            .set("year", parseInt(aYear));
+
+        const bDate = dayjsNorway(new Date())
+            .set("day", parseInt(bDay))
+            .set("month", parseInt(bMonth)-1)
+            .set("year", parseInt(bYear));
+
+        if(aDate.toDate() > bDate.toDate()){
+            return 1;
+        }
+
+        return -1;
+    });
 
     //TODO refactor to reducer
     const [reservationState, setReservationState] = useState(reservations);

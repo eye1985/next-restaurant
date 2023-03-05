@@ -93,11 +93,6 @@ export const getAggregatedReservation = async (client: MongoClient) => {
                         reservation: 1,
                     },
                 },
-                {
-                    $sort: {
-                        _id: 1,
-                    },
-                },
             ])
             .toArray();
     } catch (error) {

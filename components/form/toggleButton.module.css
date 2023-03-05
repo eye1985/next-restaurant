@@ -11,6 +11,7 @@
     color: var(--toggle-button-color);
     display: flex;
     align-items: center;
+    justify-content: space-between;
     border-radius: 0;
     background: var(--toggle-button-bg);
     border: 1px solid var(--toggle-button-color);

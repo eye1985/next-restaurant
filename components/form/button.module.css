@@ -93,3 +93,15 @@
         min-width: 200px;
     }
 }
+
+.spaceBetween{
+    justify-content: space-between;
+}
+
+.containerNoMargin{
+    margin-top:0;
+}
+
+.marginTop20{
+    margin-top:20px;
+}

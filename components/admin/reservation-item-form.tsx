@@ -78,7 +78,7 @@ function ReservationItemForm(props: ReservationItemFormProps) {
                 </div>
             </div>
 
-            <SubmitButtonContainer>
+            <SubmitButtonContainer justify="space-between" marginTop="20">
                 <Button renderComponent={(btnClass)=>(
                     <Link className={`${btnClass}`} href={`/admin/edit/${reservation._id}`} title="Edit">
                         Edit
