@@ -88,6 +88,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
                 const {
                     name,
                     time,
+                    formattedDate,
                     email,
                     phone,
                     totalGuests,
@@ -100,6 +101,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
                 const insert = await collection.insertOne({
                     name: name,
                     time: localToNorwegianTime(time),
+                    formattedDate,
                     email: email,
                     phone: phone,
                     totalGuests: totalGuests,
@@ -135,6 +137,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
                             email: reqBody.email,
                             phone: reqBody.phone,
                             time: localToNorwegianTime(reqBody.time),
+                            formattedDate:reqBody.formattedDate,
                             timeOfReservation: dayjsNorway(new Date()).toDate(),
                             totalGuests: reqBody.totalGuests,
                         },

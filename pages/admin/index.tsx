@@ -18,7 +18,6 @@ import NotificationBar from "@/components/notifications/notification-bar";
 import { ReservationSerialized } from "@/interfaces/reservation";
 import { connectToDB, getAggregatedReservation } from "@/lib/db";
 import ToggleButtonContainer from "@/components/form/toggle-button-container";
-import { fromISOToDate } from "@/utils/date";
 import dayjs from "dayjs";
 import {cloneDeep} from "lodash";
 
@@ -70,13 +69,6 @@ function AdminPage(props: AdminProps) {
     const [useLoader, setUseLoader] = useState(false);
 
     const reservations: ReservationObj[] = JSON.parse(props.reservations);
-
-    reservations.forEach((reservationObj) => {
-        reservationObj.reservation = reservationObj.reservation.map((res) => ({
-            ...res,
-            time: fromISOToDate(res.time).toJSON(),
-        }));
-    });
 
     reservations.sort((a, b) => {
         const [aDay, aMonth, aYear] = a.date.split(".");

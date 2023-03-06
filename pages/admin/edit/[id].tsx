@@ -15,13 +15,18 @@ import FormInput from "@/components/form/form-elements/form-input";
 import { FormEvent, useReducer, useState } from "react";
 import DaySelector from "@/components/reservation/day-selector";
 import Panel from "@/components/panel";
-import {dayjsNorway, fromISOToDate} from "@/utils/date";
+import {
+    formattedDateObj,
+    fromISOToDate,
+    toDateFromFormattedDate,
+} from "@/utils/date";
 import NotificationBar from "@/components/notifications/notification-bar";
 import FormLabel from "@/components/form/form-elements/form-label";
 import FormRow from "@/components/form/form-elements/form-row";
 import FormElements from "@/components/form/form-elements/form-elements";
 import SubmitButtonContainer from "@/components/form/submit-button-container";
-import {useRouter} from "next/router";
+import { useRouter } from "next/router";
+import dayjs from "dayjs";
 
 interface EditReservationProps {
     message?: string;
@@ -81,11 +86,13 @@ function reducer(state: ReservationDeSerialized, action: Action) {
             return {
                 ...state,
                 time: payload,
+                formattedDate: formattedDateObj(payload.toJSON()),
             };
         case ReservationAction.UPDATE_TIME:
             return {
                 ...state,
                 time: payload,
+                formattedDate: formattedDateObj(payload.toJSON()),
             };
         default:
             return state;
@@ -136,6 +143,8 @@ function EditReservation(props: EditReservationProps) {
         setUseLoader(false);
     };
 
+    const localTimeDayjs = toDateFromFormattedDate(reservation.formattedDate);
+
     return (
         <>
             <Head>
@@ -148,7 +157,7 @@ function EditReservation(props: EditReservationProps) {
                         <form onSubmit={handleSubmit}>
                             <DaySelector
                                 isEdit
-                                selected={reservation.time}
+                                selected={localTimeDayjs.toDate()}
                                 setSelected={(day) => {
                                     dispatch({
                                         type: ReservationAction.UPDATE_DAY,
@@ -158,7 +167,7 @@ function EditReservation(props: EditReservationProps) {
                                 radioChangeHandler={(event) => {
                                     dispatch({
                                         type: ReservationAction.UPDATE_TIME,
-                                        payload: dayjsNorway(
+                                        payload: dayjs(
                                             event.target.value
                                         ).toDate(),
                                     });
@@ -242,7 +251,9 @@ function EditReservation(props: EditReservationProps) {
                             ) : null}
 
                             <SubmitButtonContainer>
-                                <Button loader={useLoader} primary>Edit</Button>
+                                <Button loader={useLoader} primary>
+                                    Edit
+                                </Button>
                                 <Button
                                     renderComponent={(btnClass) => (
                                         <Link

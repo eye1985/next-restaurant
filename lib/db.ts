@@ -76,6 +76,7 @@ export const getAggregatedReservation = async (client: MongoClient) => {
                                 _id: "$_id",
                                 name: "$name",
                                 time: "$time",
+                                formattedDate:"$formattedDate",
                                 email: "$email",
                                 phone: "$phone",
                                 totalGuests: "$totalGuests",

@@ -7,6 +7,8 @@ import {useContext} from "react";
 import {ReservationContext} from "@/context/reservation-context-provider";
 import {ZodError} from "zod";
 import dayjs from "dayjs";
+import {ReservationDeSerializedNoId} from "@/interfaces/reservation";
+import {formattedDateObj} from "@/utils/date";
 
 function Reservation() {
     const {selectedTime, phone, fullName, email, totalGuests} =
@@ -14,12 +16,13 @@ function Reservation() {
 
     const submitReservationHandler = async () => {
         try {
-            const reservationBody = {
+            const reservationBody:ReservationDeSerializedNoId = {
                 email,
                 phone: phone ? phone : 0,
                 name: fullName,
                 totalGuests,
                 time: dayjs(selectedTime).toDate(),
+                formattedDate:formattedDateObj(selectedTime),
                 timeOfReservation: dayjs(new Date()).toDate(),
             };
 

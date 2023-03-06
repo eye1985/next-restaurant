@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ReservationSerialized } from "@/interfaces/reservation";
 import SubmitButtonContainer from "@/components/form/submit-button-container";
 import dayjs from "dayjs";
+import {toDateFromFormattedDate} from "@/utils/date";
 
 interface ReservationItemFormProps {
     reservation: ReservationSerialized;
@@ -15,6 +16,9 @@ interface ReservationItemFormProps {
 
 function ReservationItemForm(props: ReservationItemFormProps) {
     const { reservation, deleteModalHandler } = props;
+
+    const localTimeDayjs = toDateFromFormattedDate(reservation.formattedDate);
+
     return (
         <form data-id={reservation._id}>
             <div className={classes.reservationFormContainer}>
@@ -43,10 +47,10 @@ function ReservationItemForm(props: ReservationItemFormProps) {
 
                             <span className={classes.oneLine}>
                                 <time>
-                                    {dayjs(reservation.time).format(
+                                    {localTimeDayjs.format(
                                         "DD.MM.YYYY"
                                     )}{" "}
-                                    - {dayjs(reservation.time).format("HH:mm")}
+                                    - {localTimeDayjs.format("HH:mm")}
                                 </time>
                                 <span>
                                     <span
