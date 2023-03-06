@@ -46,7 +46,8 @@ function MenuItem(props: MenuItemProps) {
                     src={`/assets/img/${props.image}`}
                     alt={`${props.alt}`}
                     fill={true}
-                    sizes="1000px"
+                    sizes="(min-width: 720px) 350px,
+                    250px"
                     style={styleAttr}
                 />
 

@@ -35,8 +35,7 @@ function IntroCard(props: IntroCardProps) {
                         src={`/assets/img/${imageSrc}`}
                         alt={alt}
                         fill
-                        sizes="(min-width: 720px) 500px,
-                                33vw"
+                        sizes="250px"
                         style={{
                             objectFit: "cover",
                         }}
