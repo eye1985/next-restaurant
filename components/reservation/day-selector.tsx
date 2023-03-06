@@ -7,13 +7,7 @@ import dayjs from "dayjs";
 import classes from "./day-selector.module.css";
 import { ChangeEvent, RefObject, useContext, useEffect, useRef } from "react";
 import { ReservationContext } from "@/context/reservation-context-provider";
-import utc from "dayjs/plugin/utc";
-import timezone from "dayjs/plugin/timezone";
 import FormErrorLabel from "@/components/form/form-elements/form-error-label";
-import { dayjsNorway } from "@/utils/date";
-
-dayjs.extend(utc);
-dayjs.extend(timezone);
 
 interface DaySelectorProps {
     className?: string;
@@ -36,7 +30,7 @@ function DaySelector(props: DaySelectorProps) {
             return null;
         }
 
-        const timeISO = dayjsNorway(selectedDate).toISOString();
+        const timeISO = dayjs(selectedDate).toISOString();
         return radioRef.current.querySelector(
             `input[type='radio'][value='${timeISO}']`
         ) as HTMLInputElement;
@@ -57,10 +51,9 @@ function DaySelector(props: DaySelectorProps) {
         selectedDate: Date
     ) => {
         let tempLoop = 0;
-        let tempTime = dayjsNorway(selectedDate)
+        let tempTime = dayjs(selectedDate)
             .set("hour", hour)
             .set("minute", min)
-            .set("second", 0);
 
         const result: { time: string; iso: string }[] = [];
 
@@ -90,7 +83,7 @@ function DaySelector(props: DaySelectorProps) {
         return day === 0 || day === 1;
     };
 
-    const disabledDays = [isSundayMonday, { before: dayjsNorway(new Date()).toDate() }];
+    const disabledDays = [isSundayMonday, { before: dayjs(new Date()).toDate() }];
 
     const recursiveFirstAvailableDate = (
         selectedDate: Date,
@@ -98,7 +91,7 @@ function DaySelector(props: DaySelectorProps) {
         check: (date: Date) => boolean
     ): Date => {
         if (check(selectedDate)) {
-            const addedDayDate = dayjsNorway(selectedDate).toDate();
+            const addedDayDate = dayjs(selectedDate).toDate();
             addedDayDate.setDate(addedDayDate.getDate() + days);
             return recursiveFirstAvailableDate(addedDayDate, 1, check);
         }
@@ -123,7 +116,7 @@ function DaySelector(props: DaySelectorProps) {
                         disabled={disabledDays}
                         selected={selectedDate}
                         onSelect={(day) => {
-                            let pickedDate = dayjsNorway(new Date()).toDate();
+                            let pickedDate = dayjs(new Date()).toDate();
                             if (day) {
                                 pickedDate = day;
                             }
@@ -134,11 +127,11 @@ function DaySelector(props: DaySelectorProps) {
                                 );
 
                                 if (radioElement) {
-                                    const radioDate = dayjsNorway(
+                                    const radioDate = dayjs(
                                         radioElement.value
                                     );
 
-                                    pickedDate = dayjsNorway(pickedDate)
+                                    pickedDate = dayjs(pickedDate)
                                         .set("hour", radioDate.hour())
                                         .set("minute", radioDate.minute())
                                         .set("second", 0)
@@ -151,13 +144,13 @@ function DaySelector(props: DaySelectorProps) {
                     />
                 </div>
 
-                {selected ? (
+                {selectedDate ? (
                     <div>
                         <div
                             className={classes.radioContainer}
                             ref={radioContainer}
                         >
-                            {listOfReservations(15, 45, 13, selected).map(
+                            {listOfReservations(15, 45, 13, selectedDate).map(
                                 (dateObj, index: number) => (
                                     <div
                                         className={classes.radioItem}

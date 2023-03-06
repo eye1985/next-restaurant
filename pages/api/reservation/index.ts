@@ -3,8 +3,8 @@ import { connectToDB, getAggregatedReservation } from "@/lib/db";
 import { FetchMethods } from "@/enum/fetch-methods";
 import { ObjectId } from "mongodb";
 import { z } from "zod";
-import { ReservationDeSerialized } from "@/interfaces/reservation";
-import { dayjsNorway } from "@/utils/date";
+import {ReservationSerialized} from "@/interfaces/reservation";
+import {dayjsNorway, localToNorwegianTime} from "@/utils/date";
 
 const createReservationValidation = () => {
     return z.object({
@@ -66,16 +66,16 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
                     reservations = await collection.find({}).toArray();
                 }
 
-                await client.close();
                 res.status(200).json({
                     reservations,
                 });
             } catch (error) {
-                await client.close();
                 res.status(500).json({
                     message: "Failed to retrieve collection ",
                     error,
                 });
+            } finally {
+                await client.close();
             }
 
             break;
@@ -84,7 +84,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         case FetchMethods.POST: {
             try {
                 const collection = client.db("Bao").collection("reservations");
-                const reqBody: ReservationDeSerialized = req.body;
+                const reqBody: ReservationSerialized = req.body;
                 const {
                     name,
                     time,
@@ -99,31 +99,30 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
                 const insert = await collection.insertOne({
                     name: name,
-                    time: new Date(time),
+                    time: localToNorwegianTime(time),
                     email: email,
                     phone: phone,
                     totalGuests: totalGuests,
-                    timeOfReservation: new Date(timeOfReservation),
+                    timeOfReservation: dayjsNorway(timeOfReservation).toDate(),
                 });
-
-                await client.close();
 
                 res.status(201).json({
                     message: `${insert.insertedId} created`,
                 });
             } catch (error) {
-                await client.close();
                 res.status(500).json({
                     message: `Failed to create record`,
                     error,
                 });
+            } finally {
+                await client.close();
             }
             break;
         }
         case FetchMethods.PUT: {
             try {
                 const collection = client.db("Bao").collection("reservations");
-                const reqBody: ReservationDeSerialized = JSON.parse(req.body);
+                const reqBody: ReservationSerialized = JSON.parse(req.body);
 
                 const reservationValidation = createReservationValidation();
                 reservationValidation.parse(reqBody);
@@ -135,7 +134,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
                             name: reqBody.name,
                             email: reqBody.email,
                             phone: reqBody.phone,
-                            time: dayjsNorway(reqBody.time).toDate(),
+                            time: localToNorwegianTime(reqBody.time),
                             timeOfReservation: dayjsNorway(new Date()).toDate(),
                             totalGuests: reqBody.totalGuests,
                         },
@@ -146,11 +145,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
                     message: `${reqBody._id} updated`,
                 });
             } catch (error) {
-                await client.close();
                 res.status(500).json({
                     message: `Make sure the field constraint are correct`,
                     error,
                 });
+            } finally {
+                await client.close();
             }
             break;
         }
@@ -161,13 +161,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
                     _id: new ObjectId(req.body.id),
                 });
 
-                await client.close();
                 res.status(204).end();
             } catch (error) {
-                await client.close();
                 res.status(500).json({
                     message: `Could not delete ${req.body._id}`,
                 });
+            } finally {
+                await client.close();
             }
 
             break;

@@ -5,7 +5,6 @@ import {
     SetStateAction,
     useState,
 } from "react";
-import {dayjsNorway} from "@/utils/date";
 
 interface Reservation {
     selectedDay: Date;
@@ -25,7 +24,7 @@ interface Reservation {
 }
 
 export const ReservationContext = createContext<Reservation>({
-    selectedDay: dayjsNorway(new Date()).toDate(),
+    selectedDay: new Date(),
     setSelectedDay: (() => {}) as Dispatch<SetStateAction<Date>>,
     selectedTime: "",
     setSelectedTime: (() => {}) as Dispatch<SetStateAction<string>>,
@@ -46,7 +45,7 @@ function ReservationContextProvider({
 }: {
     children: ReactNode | ReactNode[];
 }) {
-    const [selectedDay, setSelectedDay] = useState<Date>(dayjsNorway(new Date()).toDate());
+    const [selectedDay, setSelectedDay] = useState<Date>(new Date());
     const [selectedTime, setSelectedTime] = useState("");
     const [timeError, setTimeError] = useState(false);
 

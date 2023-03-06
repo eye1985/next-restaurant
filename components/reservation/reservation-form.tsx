@@ -17,7 +17,7 @@ import { ZodError } from "zod";
 import FormErrorLabel from "@/components/form/form-elements/form-error-label";
 import CenterAlign from "@/layout/center-align";
 import spacingClasses from "@/styles/utils/spacing.module.css";
-import {dayjsNorway, formatDate} from "@/utils/date";
+import { dayjsNorway } from "@/utils/date";
 import Panel from "@/components/panel";
 
 dayjs.extend(utc);
@@ -153,14 +153,10 @@ function ReservationForm(props: ReservationFormProps) {
         <>
             {displayForm ? (
                 <Panel>
-                    <form
-                        onSubmit={submitFormHandler}
-                    >
+                    <form onSubmit={submitFormHandler}>
                         <DaySelector
                             selected={selectedDay}
-                            setSelected={
-                                setSelectedDay
-                            }
+                            setSelected={setSelectedDay}
                             radioChangeHandler={radioChangeHandler}
                         />
                         <FormElements>
@@ -238,8 +234,7 @@ function ReservationForm(props: ReservationFormProps) {
                             <p>
                                 Reserve for {totalGuests} person at{" "}
                                 <time>
-                                    {formatDate(
-                                        selectedTime,
+                                    {dayjs(selectedTime).format(
                                         "DD.MM.YYYY HH:mm"
                                     )}
                                 </time>
@@ -254,7 +249,12 @@ function ReservationForm(props: ReservationFormProps) {
                             </p>
 
                             <div className={reactModalClasses.buttonContainer}>
-                                <Button onClick={submitHandler} loader={confirmLoader} primary full>
+                                <Button
+                                    onClick={submitHandler}
+                                    loader={confirmLoader}
+                                    primary
+                                    full
+                                >
                                     Confirm
                                 </Button>
                                 <Button onClick={closeModal} full>
@@ -277,7 +277,7 @@ function ReservationForm(props: ReservationFormProps) {
                         We will be expecting you at:
                         <br />
                         <time>
-                            {formatDate(selectedTime, "DD.MM.YYYY HH:mm")}
+                            {dayjs(selectedTime).format("DD.MM.YYYY HH:mm")}
                         </time>
                     </p>
 

@@ -48,7 +48,7 @@ export const authOptions: NextAuthOptions = {
                 if(!adminUser){
                     throw new Error("Incorrect username or password");
                 }
-
+                await client.close();
                 return {
                     id: adminUser._id.toString(),
                     user:adminUser.username

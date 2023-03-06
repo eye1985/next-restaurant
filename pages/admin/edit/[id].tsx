@@ -15,7 +15,7 @@ import FormInput from "@/components/form/form-elements/form-input";
 import { FormEvent, useReducer, useState } from "react";
 import DaySelector from "@/components/reservation/day-selector";
 import Panel from "@/components/panel";
-import { dayjsNorway } from "@/utils/date";
+import {dayjsNorway, fromISOToDate} from "@/utils/date";
 import NotificationBar from "@/components/notifications/notification-bar";
 import FormLabel from "@/components/form/form-elements/form-label";
 import FormRow from "@/components/form/form-elements/form-row";
@@ -95,10 +95,8 @@ function reducer(state: ReservationDeSerialized, action: Action) {
 function EditReservation(props: EditReservationProps) {
     const deSerializedReservation: ReservationDeSerialized = {
         ...props.reservation,
-        time: dayjsNorway(props.reservation.time).toDate(),
-        timeOfReservation: dayjsNorway(
-            props.reservation.timeOfReservation
-        ).toDate(),
+        time: fromISOToDate(props.reservation.time),
+        timeOfReservation: fromISOToDate(props.reservation.timeOfReservation),
     };
 
     const router = useRouter();
@@ -307,8 +305,8 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
             reservation: {
                 ...reservation,
                 _id: reservation._id.toString(),
-                time: reservation.time.toString(),
-                timeOfReservation: reservation.timeOfReservation.toString(),
+                time: reservation.time.toJSON(),
+                timeOfReservation: reservation.timeOfReservation.toISOString(),
             },
         },
     };

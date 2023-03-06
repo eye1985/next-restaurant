@@ -19,7 +19,8 @@ import NotificationBar from "@/components/notifications/notification-bar";
 import { ReservationSerialized } from "@/interfaces/reservation";
 import { connectToDB, getAggregatedReservation } from "@/lib/db";
 import ToggleButtonContainer from "@/components/form/toggle-button-container";
-import { dayjsNorway } from "@/utils/date";
+import {fromISOToDate} from "@/utils/date";
+import dayjs from "dayjs";
 
 interface ReservationObj {
     count: number;
@@ -39,16 +40,23 @@ function AdminPage(props: AdminProps) {
 
     const reservations: ReservationObj[] = JSON.parse(props.reservations);
 
+    reservations.forEach(reservationObj => {
+        reservationObj.reservation = reservationObj.reservation.map(res => ({
+            ...res,
+            time: fromISOToDate(res.time).toJSON(),
+        }))
+    });
+
     reservations.sort((a, b) => {
         const [aDay, aMonth, aYear] = a.date.split(".");
         const [bDay, bMonth, bYear] = b.date.split(".");
 
-        const aDate = dayjsNorway(new Date())
+        const aDate = dayjs(new Date())
             .set("day", parseInt(aDay))
             .set("month", parseInt(aMonth)-1)
             .set("year", parseInt(aYear));
 
-        const bDate = dayjsNorway(new Date())
+        const bDate = dayjs(new Date())
             .set("day", parseInt(bDay))
             .set("month", parseInt(bMonth)-1)
             .set("year", parseInt(bYear));
@@ -302,6 +310,8 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
             },
         };
     }
+
+    await client.close();
 
     return {
         props: {

@@ -2,10 +2,10 @@ import Button from "@/components/form/button";
 import { MouseEvent } from "react";
 import classes from "./reservation-item-form.module.css";
 import { BsFillPeopleFill } from "react-icons/bs";
-import { formatDate } from "@/utils/date";
 import Link from "next/link";
-import {ReservationSerialized} from "@/interfaces/reservation";
+import { ReservationSerialized } from "@/interfaces/reservation";
 import SubmitButtonContainer from "@/components/form/submit-button-container";
+import dayjs from "dayjs";
 
 interface ReservationItemFormProps {
     reservation: ReservationSerialized;
@@ -43,8 +43,10 @@ function ReservationItemForm(props: ReservationItemFormProps) {
 
                             <span className={classes.oneLine}>
                                 <time>
-                                    {formatDate(reservation.time, "DD.MM.YYYY")}{" "}
-                                    - {formatDate(reservation.time, "HH:mm")}
+                                    {dayjs(reservation.time).format(
+                                        "DD.MM.YYYY"
+                                    )}{" "}
+                                    - {dayjs(reservation.time).format("HH:mm")}
                                 </time>
                                 <span>
                                     <span
@@ -63,13 +65,11 @@ function ReservationItemForm(props: ReservationItemFormProps) {
                         >
                             <strong>Registered at</strong>
                             <time>
-                                {formatDate(
-                                    reservation.timeOfReservation,
+                                {dayjs(reservation.timeOfReservation).format(
                                     "DD.MM.YYYY"
                                 )}{" "}
                                 -{" "}
-                                {formatDate(
-                                    reservation.timeOfReservation,
+                                {dayjs(reservation.timeOfReservation).format(
                                     "HH:mm"
                                 )}
                             </time>
@@ -79,11 +79,17 @@ function ReservationItemForm(props: ReservationItemFormProps) {
             </div>
 
             <SubmitButtonContainer justify="space-between" marginTop="20">
-                <Button renderComponent={(btnClass)=>(
-                    <Link className={`${btnClass}`} href={`/admin/edit/${reservation._id}`} title="Edit">
-                        Edit
-                    </Link>
-                )} />
+                <Button
+                    renderComponent={(btnClass) => (
+                        <Link
+                            className={`${btnClass}`}
+                            href={`/admin/edit/${reservation._id}`}
+                            title="Edit"
+                        >
+                            Edit
+                        </Link>
+                    )}
+                />
 
                 <Button
                     type="button"

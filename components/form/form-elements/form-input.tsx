@@ -6,7 +6,7 @@ interface FormInputProps extends InputHTMLAttributes<HTMLInputElement> {
 }
 
 function FormInput(attrs: FormInputProps) {
-    const { className, innerRef, value, ...restProps } = attrs;
+    const { className, innerRef, ...restProps } = attrs;
 
     let refObj = {};
     if (innerRef) {
@@ -15,18 +15,10 @@ function FormInput(attrs: FormInputProps) {
         };
     }
 
-    let valueObj = {};
-    if (value) {
-        valueObj = {
-            value,
-        };
-    }
-
     return (
         <input
             className={`${classes.formInput} ${className}`}
             {...refObj}
-            {...valueObj}
             {...restProps}
         />
     );
