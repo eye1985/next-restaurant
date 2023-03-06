@@ -2,7 +2,7 @@ import Head from "next/head";
 import ContainerLayout from "@/layout/containerLayout";
 import HeaderTitle from "@/components/header-title";
 import { GetServerSidePropsContext } from "next";
-import { ChangeEvent, MouseEvent, useState } from "react";
+import { ChangeEvent, useReducer, useState } from "react";
 import Modal from "react-modal";
 import ReservationItem from "@/components/admin/reservation-item";
 import AdminLayout from "@/layout/admin-layout";
@@ -11,7 +11,6 @@ import { authOptions } from "@/pages/api/auth/[...nextauth]";
 import ToggleButton from "@/components/form/toggleButton";
 import AdminSectionHeader from "@/components/admin/admin-section-header";
 import AdminDescription from "@/components/admin/admin-description";
-import { cloneDeep } from "lodash";
 import ReservationItemForm from "@/components/admin/reservation-item-form";
 import Button from "@/components/form/button";
 import reactModalClasses from "@/styles/react-modal.module.css";
@@ -19,11 +18,11 @@ import NotificationBar from "@/components/notifications/notification-bar";
 import { ReservationSerialized } from "@/interfaces/reservation";
 import { connectToDB, getAggregatedReservation } from "@/lib/db";
 import ToggleButtonContainer from "@/components/form/toggle-button-container";
-import {fromISOToDate} from "@/utils/date";
+import { fromISOToDate } from "@/utils/date";
 import dayjs from "dayjs";
+import {cloneDeep} from "lodash";
 
 interface ReservationObj {
-    count: number;
     date: string;
     reservation: ReservationSerialized[];
 }
@@ -34,17 +33,49 @@ interface AdminProps {
     error?: string;
 }
 
+enum AdminReservationActions {
+    DELETE_RESERVATION = "DELETE_RESERVATION",
+}
+
+type AdminReservationAction = {
+    payload: {
+        currentIndex: number;
+        reservationId: string;
+    };
+    type: AdminReservationActions;
+};
+
+function reducer(state: ReservationObj[], action: AdminReservationAction) {
+    const { type, payload } = action;
+
+    switch (type) {
+        case AdminReservationActions.DELETE_RESERVATION:
+            let clone = cloneDeep(state);
+            clone[payload.currentIndex].reservation = state[payload.currentIndex].reservation.filter(
+                (reservation) => reservation._id !== payload.reservationId
+            );
+
+            if(clone[payload.currentIndex].reservation.length === 0){
+               clone = clone.filter(reservationObj => reservationObj.date !== clone[payload.currentIndex].date)
+            }
+
+            return clone;
+        default:
+            return state;
+    }
+}
+
 function AdminPage(props: AdminProps) {
     const [modalIsOpen, setIsOpen] = useState(false);
     const [useLoader, setUseLoader] = useState(false);
 
     const reservations: ReservationObj[] = JSON.parse(props.reservations);
 
-    reservations.forEach(reservationObj => {
-        reservationObj.reservation = reservationObj.reservation.map(res => ({
+    reservations.forEach((reservationObj) => {
+        reservationObj.reservation = reservationObj.reservation.map((res) => ({
             ...res,
             time: fromISOToDate(res.time).toJSON(),
-        }))
+        }));
     });
 
     reservations.sort((a, b) => {
@@ -53,61 +84,43 @@ function AdminPage(props: AdminProps) {
 
         const aDate = dayjs(new Date())
             .set("day", parseInt(aDay))
-            .set("month", parseInt(aMonth)-1)
+            .set("month", parseInt(aMonth) - 1)
             .set("year", parseInt(aYear));
 
         const bDate = dayjs(new Date())
             .set("day", parseInt(bDay))
-            .set("month", parseInt(bMonth)-1)
+            .set("month", parseInt(bMonth) - 1)
             .set("year", parseInt(bYear));
 
-        if(aDate.toDate() > bDate.toDate()){
+        if (aDate.toDate() > bDate.toDate()) {
             return 1;
         }
 
         return -1;
     });
 
-    //TODO refactor to reducer
-    const [reservationState, setReservationState] = useState(reservations);
+    const [reservationObjs, dispatch] = useReducer(reducer, reservations);
 
     const [currentReservationIndex, setCurrentReservationIndex] = useState(0);
     const [currentToDeleteReservationId, setCurrentToDeleteReservationId] =
         useState("");
 
-    function openModal() {
-        setIsOpen(true);
-    }
-
     function closeModal() {
         setIsOpen(false);
     }
 
-    const deleteModalHandler = (event: MouseEvent) => {
-        const id = (event.target as HTMLButtonElement).getAttribute("data-id");
+    const deleteModalHandler = (id: string) => {
         if (id) {
             setCurrentToDeleteReservationId(id);
+            setIsOpen(true);
         }
-        openModal();
     };
 
     const deleteHandler = async () => {
         if (currentToDeleteReservationId) {
             setUseLoader(true);
             try {
-                const clonedReservationState = cloneDeep(reservationState);
-                clonedReservationState[currentReservationIndex].count -= 1;
-                clonedReservationState[currentReservationIndex].reservation = [
-                    ...clonedReservationState[
-                        currentReservationIndex
-                    ].reservation.filter(
-                        (reservation) =>
-                            reservation._id !== currentToDeleteReservationId
-                    ),
-                ];
-                setReservationState(clonedReservationState);
-
-                await fetch(`/api/reservation`, {
+                const res = await fetch(`/api/reservation`, {
                     method: "delete",
                     headers: {
                         "Content-Type": "application/json",
@@ -115,6 +128,18 @@ function AdminPage(props: AdminProps) {
                     body: JSON.stringify({
                         id: currentToDeleteReservationId,
                     }),
+                });
+
+                if(!res.ok){
+                    return;
+                }
+
+                dispatch({
+                    type: AdminReservationActions.DELETE_RESERVATION,
+                    payload: {
+                        currentIndex: currentReservationIndex,
+                        reservationId: currentToDeleteReservationId,
+                    },
                 });
             } catch (error) {
                 console.log(error);
@@ -165,7 +190,7 @@ function AdminPage(props: AdminProps) {
                     value={reservationObj.date}
                     data-index={index}
                     defaultChecked={index === 0}
-                    amount={reservationObj.count}
+                    amount={reservationObj.reservation.length}
                     onChange={displayReservationHandler}
                 />
             );
@@ -192,7 +217,7 @@ function AdminPage(props: AdminProps) {
                         automatically deleted.
                     </AdminDescription>
 
-                    {reservationState.length === 0 ? (
+                    {reservationObjs.length === 0 ? (
                         <p>No reservations</p>
                     ) : (
                         <AdminLayout>
@@ -203,7 +228,7 @@ function AdminPage(props: AdminProps) {
                                     </AdminSectionHeader>
                                 </div>
                                 <ToggleButtonContainer>
-                                    {renderReservationJSX(reservationState)}
+                                    {renderReservationJSX(reservationObjs)}
                                 </ToggleButtonContainer>
                             </div>
 
@@ -211,8 +236,8 @@ function AdminPage(props: AdminProps) {
                                 <AdminSectionHeader>
                                     Reservations details
                                 </AdminSectionHeader>
-                                {reservationState.length > 0 &&
-                                    reservationState[
+                                {reservationObjs.length > 0 &&
+                                    reservationObjs[
                                         currentReservationIndex
                                     ].reservation.map((reservation, index) => {
                                         return (

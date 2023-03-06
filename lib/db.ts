@@ -71,7 +71,6 @@ export const getAggregatedReservation = async (client: MongoClient) => {
                                 date: "$time",
                             },
                         },
-                        count: { $sum: 1 },
                         reservation: {
                             $push: {
                                 _id: "$_id",
@@ -88,7 +87,6 @@ export const getAggregatedReservation = async (client: MongoClient) => {
                 {
                     $project: {
                         date: "$_id",
-                        count: 1,
                         _id: 0,
                         reservation: 1,
                     },

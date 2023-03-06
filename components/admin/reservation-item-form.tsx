@@ -9,7 +9,7 @@ import dayjs from "dayjs";
 
 interface ReservationItemFormProps {
     reservation: ReservationSerialized;
-    deleteModalHandler: (event: MouseEvent) => void;
+    deleteModalHandler: (reservationId:string,event: MouseEvent) => void;
     deleteHandler: (event: MouseEvent) => void;
 }
 
@@ -93,7 +93,7 @@ function ReservationItemForm(props: ReservationItemFormProps) {
 
                 <Button
                     type="button"
-                    onClick={deleteModalHandler}
+                    onClick={deleteModalHandler.bind(null, reservation._id)}
                     data-id={reservation._id}
                     danger
                 >
