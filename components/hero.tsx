@@ -10,6 +10,7 @@ function Hero() {
                 src={"/assets/img/bun.jpg"}
                 alt="bun"
                 priority
+                sizes="100vw"
                 fill={true}
                 style={{
                     objectFit: "cover",
